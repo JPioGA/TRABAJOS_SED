@@ -1,0 +1,1 @@
+Trabajo dedicado a un estabilizador de una plataforma en uno o dos ejes.
