@@ -1,0 +1,28 @@
+MODOS DE JUEGO:
+
+ARCADE:
+Juego de varias rondas (Se puede elegir cuantas rondas hacer o que sea infinito hasta que el jugador pierda). Cada vez se aumenta la secuencia y los leds se pueden encender aleatoriamente.
+Propuesta:
+Utilizar 3 leds de la placa y 3 botones (Los que están en horizontal) para que los leds y los botones coincidan.
+Para llevar la puntuación se usa la parte derecha de los displays de 7 segmentos.
+Mejora:
+Utilizar pantalla conexión VGA con un dibujo con la forma de los botones para usarlos todos.
+
+
+TIME ATTACK:
+Juego infinito hasta que el jugador pierda. La secuencia aumenta y se reduce el tiempo de respuesta del jugador.
+Propuesta:
+Utilizar 3 leds de la placa y 3 botones.
+Para que el jugador sea consciente del tiempo se saca por los displays de 7 segmentos de la izquierda.
+La puntuación se saca por los displays de 7 segmentos de la derecha.
+Mejora:
+Ampliar a VGA.
+
+
+VS:
+Juego infinito de 2 jugadores hasta que uno de ellos pierda (puede hacerse al mejor de 3). Cada vez se aumenta la secuencia y se complica. Se puede aumentar la velocidad de cambio de estado.
+Propuesta:
+Utilizar 3 leds de la placa y 3 botones. Utilizar leds centrales.
+La puntuación del jugador 1 se saca por los displays de 7 segmentos de la derecha. Del jugador 2 se saca por los displays de la izquierda.
+Mejora:
+Ampliar a VGA. 
