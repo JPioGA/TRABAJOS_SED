@@ -1,0 +1,26 @@
+--------------------------------------------EN GENERAL------------------------------------------------
+1. Lógica de salida de leds de colores
+2. Lógica de salida de mensajes por displays de 7 segmentos (pensar en los distintos mensajes q mostrar(rondas, tiempo, puntuación, etcc...))
+3. Lógica de entrada por los pulsadores (antirebotes, detector de flancos, etc...)
+4. Máquinas de estado
+	4.1. Una para el control de fases del juego (menu de selección de modo, juego, fin del juego, etc..). Como el coordinador del Pang vamos.
+	4.2. Una por cada modo de juego (empezar con la del arcade)
+	4.3. Contadores y temporizadores (son máquinas de estado) (podemos pensar como hacer una que nos sirva pa casi to)
+5. Generador de secuencias aleatorio (generador de números del 1 al 3 de forma aleatoria)
+6. TESTBENCHS (según se vaya necesitando)
+7. Control de pantalla VGA (ya veremos de que va esto)
+
+OJO! Pensar en la forma de interconectar lo bloques.
+OJO! Hay que hacer un glosario (tabla) con los distintos nombres de las señales que vamos a utilizar para no hacernos un lio.
+
+------------------------------------EN ESPECÍFICO (para cada modo)------------------------------------
+---ARCADE---
+
+
+---TIME ATTACK---
+Temporizador con reinicio por ronda
+
+---VS---
+Duplicar entradas de los botones
+2 Contadores de rondas/puntuación en cada display de 7 sementos 
+Indicador de quien es el turno (puede ser encender 2 leds de la linea de abajo según que jugador le toca)
