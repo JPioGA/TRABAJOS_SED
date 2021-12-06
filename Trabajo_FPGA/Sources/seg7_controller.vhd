@@ -10,7 +10,7 @@ entity seg7_controller is
     round_7seg_larger  : in  std_logic_vector(6 downto 0);
     CLK                : in std_logic;
     anode              : out std_logic_vector(7 downto 0) := "00000000";
-    segments           : out std_logic_vector(6 downto 0) := "0000000"
+    segments           : out std_logic_vector(6 downto 0) := "1111111"
    );
 end seg7_controller;
 
