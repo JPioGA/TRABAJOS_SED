@@ -6,8 +6,8 @@ use ieee.std_logic_unsigned.all;
 
 entity Button_top is
 port(
-Button_in		:in  std_logic_vector(3 to 0);
-Button_out		:out std_logic_vector(3 to 0);
+Button_in		:in  std_logic_vector(4 to 0);
+Button_out		:out std_logic_vector(4 to 0);
 CLK100MHZ		:in  std_logic;
 CPU_RESETN		:in  std_logic;
 );
@@ -25,10 +25,11 @@ port (
 end component;
 
 begin
-Boton_up:		Button port map(CLK100MHZ, Button_in[0], CPU_RESETN, Button_out[0]);
-Boton_down:		Button port map(CLK100MHZ, Button_in[1], CPU_RESETN, Button_out[1]);
-Boton_left:		Button port map(CLK100MHZ, Button_in[2], CPU_RESETN, Button_out[2]);
-Boton_right:	Button port map(CLK100MHZ, Button_in[3], CPU_RESETN, Button_out[3]);
+Boton_ok:		Button port map(CLK100MHZ, Button_in[0], CPU_RESETN, Button_out[0]);
+Boton_up:		Button port map(CLK100MHZ, Button_in[1], CPU_RESETN, Button_out[1]);
+Boton_down:		Button port map(CLK100MHZ, Button_in[2], CPU_RESETN, Button_out[2]);
+Boton_left:		Button port map(CLK100MHZ, Button_in[3], CPU_RESETN, Button_out[3]);
+Boton_right:	Button port map(CLK100MHZ, Button_in[4], CPU_RESETN, Button_out[4]);
 
 end architecture structural;
 
