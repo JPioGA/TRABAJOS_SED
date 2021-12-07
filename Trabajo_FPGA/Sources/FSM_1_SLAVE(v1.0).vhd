@@ -29,8 +29,9 @@ begin
 	process(CLK, RST_N, RST_COUNT) -- Entradas asíncronas (RST_COUNT)
 	begin
 		DONE <= '1' when count = 0 else '0';
+		
 		if RST_N = '0' then -- Si entra un reset, mandamos a reposo la máquina de estados
-			count <= (others => '0');
+			count <= 0;
 			DONE <= '1';
 		elsif RST_COUNT = '1' then
 			DONE <= '0';
