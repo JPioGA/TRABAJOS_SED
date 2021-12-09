@@ -1,4 +1,3 @@
-
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -6,12 +5,12 @@ entity button_tb is
 end button_tb;
 
 architecture tb of button_tb is
-	component Button_UP
+	component Button
 	port ( 
 			CLK100MHZ	: in     std_logic;
-			BTNC_UP		: in     std_logic;
+			BTNC		: in     std_logic;
 			CPU_RESETN	: in     std_logic;
-			BUTTON_UP_PUSHED:out	 std_logic;
+			BUTTON_PUSHED:out	 std_logic
 		);
 	end component;
 
@@ -22,7 +21,7 @@ architecture tb of button_tb is
 	constant k  : time := 5ns;
 	
 begin
-	uut: Button_UP port map (clk, boton, reset, botonpulsado);
+	uut: Button port map (clk, boton, reset, botonpulsado);
 	
 	clk<=not clk after k;
 	
