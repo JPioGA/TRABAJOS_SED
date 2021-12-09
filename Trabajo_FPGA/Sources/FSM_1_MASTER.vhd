@@ -14,13 +14,13 @@ entity FSM_1_MASTER is
         MAX_ROUND   : natural := 99;
         COLORS      : natural := 4
     );
-    Port (
+    port (
         -- General MASTER interface
         CLK         : in std_logic;
         RST_N       : in std_logic;
         OK_BUTTON   : in std_logic;
         ROUND       : out natural;
-        OUT_MESSAGE : out natural;
+        OUT_MESSAGE : out natural; -- 1: START ANIMATION; 2: GO INPUT ANIMATION; 3: INPUT OK ANIMATION; 4: GAME OVER ANIMATION
         
         -- MASTER-SLAVE SHOWSEQ interface
         START_SHOWSEQ           : out std_logic;
@@ -29,9 +29,10 @@ entity FSM_1_MASTER is
         DONE_SHOWSEQ            : in std_logic;
         
         -- MASTER-SLAVE INCHECK interface
-        START_INCHECK : out std_logic;
-        PARAM_INCHECK : out natural;
-        DONE_INCHECK  : in natural; -- 0: none; 1: NO OK; 2: OK
+        START_INCHECK       : out std_logic;
+        PARAM_INCHECK_size  : out natural;
+        PARAM_INCHECK_seq   : out natural(0 to MAX_ROUND-1);
+        DONE_INCHECK        : in natural; -- 0: none; 1: NO OK; 2: OK
         
         -- MASTER-SLAVE TIMER interface
         START_TIMER : out std_logic;
@@ -49,9 +50,10 @@ architecture Behavioral of FSM_1_MASTER is
 		S0,		-- S0: START GAME. Se muestra una animación que indica el inicio del juego.
 		S1,		-- S1: ADD VALUE. Adición de un nuevo valor a la secuencia
 		S2,		-- S2: SHOW SEQUENCE. Activación de la FSM SLAVE SHOWSEQ. Muestra por los LEDS la secuencia que tendrá que introducir el jugador.
-		S3,		-- S3: START INCHECK Y TIMER. Disparo del temporizador tras mostrar la secuencia, Y activación de la comprobación de los inputs del jugador.
-		S4,		-- S4: INPUTS OK: El jugador ha introducido todos los valores correctamente.
-		S5		-- S5: GAME OVER. El jugador ha perdido por fin del tiempo o por error en el input. Se muestra animación de fin de juego
+		S3,     -- S3: GO ANIMATION: Animación que indica que el jugador comience a introducir sus inputs.
+		S4,		-- S3: START INCHECK Y TIMER. Disparo del temporizador tras mostrar la secuencia, Y activación de la comprobación de los inputs del jugador.
+		S5,		-- S4: INPUTS OK: El jugador ha introducido todos los valores correctamente.
+		S6		-- S5: GAME OVER. El jugador ha perdido por fin del tiempo o por error en el input. Se muestra animación de fin de juego
 	);
 	subtype BUTTON_T is integer range 1 to 4; -- 1: UP_BUTTON	2: DOWN_BUTTON	3: RIGHT_BUTTON	4: LEFT_BUTTON	  (El subtipo está hecho para ahorrar recursos en la síntesis)
 	
@@ -124,16 +126,24 @@ begin
 				end if;
 				
 			when S3 =>
-				wait for 1000 ms;
 				nxt_state <= S4;
 				
 				
 			when S4 =>
-				
+				if (DONE_INCHECK = 1) OR (DONE_TIMER = '1') then
+				   nxt_state <= S6; --GAME OVER
+				elsif DONE_INCHECK = 2 then
+				   nxt_state <= S5; --INPUT SEQUENCE OK
+				end if;
 				
 			when S5 =>
+				wait for 3000 ms;
+				nxt_state <= S1; -- Añadir nuevo valor a la secuencia
 				
-				
+			when S6 =>
+			    wait for 3000 ms;
+				nxt_state <= S0_WT; --Vuelta a esperar
+			
 			when others =>
 				nxt_state <= S0_WT; -- En caso de fallo, volver al estado de espera.	
 		end case;	
@@ -153,7 +163,8 @@ begin
         PARAM_SHOWSEQ_size      <= 0;
         -- MASTER-SLAVE INCHECK interface
         START_INCHECK           <= '0';
-        PARAM_INCHECK           <= 0;
+        PARAM_INCHECK_size      <= 0;
+        PARAM_INCHECK_seq       <= 0;
         -- MASTER-SLAVE TIMER interface
         START_TIMER             <= '0';
         PARAM_TIMER             <= 0;
@@ -163,14 +174,15 @@ begin
 			when S0_WT =>
 				-- General MASTER interface
                 ROUND                   <= 0;
-                OUT_MESSAGE             <= 0;
+                OUT_MESSAGE             <= 1;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
                 PARAM_SHOWSEQ_sequence  <= 0;
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
@@ -186,7 +198,8 @@ begin
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
@@ -202,7 +215,8 @@ begin
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
@@ -213,33 +227,35 @@ begin
                 ROUND                   <= 0;
                 OUT_MESSAGE             <= 0;
                 -- MASTER-SLAVE SHOWSEQ interface
-                START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= 0;
-                PARAM_SHOWSEQ_size      <= 0;
+                START_SHOWSEQ           <= '1'; -- Se inicia el esclavo de muestra de la secuencia
+                PARAM_SHOWSEQ_sequence  <= game_sequence;
+                PARAM_SHOWSEQ_size      <= size;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
-				
+			
 			when S3 =>
 				-- General MASTER interface
                 ROUND                   <= 0;
-                OUT_MESSAGE             <= 0;
+                OUT_MESSAGE             <= 2; -- GO ANIMATION
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
                 PARAM_SHOWSEQ_sequence  <= 0;
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
-				
+                	
 			when S4 =>
 				-- General MASTER interface
                 ROUND                   <= 0;
@@ -249,14 +265,32 @@ begin
                 PARAM_SHOWSEQ_sequence  <= 0;
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
-                START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                START_INCHECK           <= '1';
+                PARAM_INCHECK_size      <= size;
+                PARAM_INCHECK_seq       <= game_sequence;
                 -- MASTER-SLAVE TIMER interface
-                START_TIMER             <= '0';
-                PARAM_TIMER             <= 0;
+                START_TIMER             <= '1';
+                PARAM_TIMER             <= size; --Según numero de rondas, varía el tiempo
                 RST_COUNT               <= '0';
 				
 			when S5 =>
+				-- General MASTER interface
+                ROUND                   <= 0;
+                OUT_MESSAGE             <= 0;
+                -- MASTER-SLAVE SHOWSEQ interface
+                START_SHOWSEQ           <= '0';
+                PARAM_SHOWSEQ_sequence  <= 0; 
+                PARAM_SHOWSEQ_size      <= 0;
+                -- MASTER-SLAVE INCHECK interface
+                START_INCHECK           <= '0';
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
+                -- MASTER-SLAVE TIMER interface
+                START_TIMER             <= '0';
+                PARAM_TIMER             <= 0;
+                RST_COUNT               <= '1';
+				
+			when S6 =>
 				-- General MASTER interface
                 ROUND                   <= 0;
                 OUT_MESSAGE             <= 0;
@@ -266,11 +300,12 @@ begin
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
-                RST_COUNT               <= '0';
+                RST_COUNT               <= '1';
 				
 			when others =>
 				-- General MASTER interface
@@ -282,7 +317,8 @@ begin
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
-                PARAM_INCHECK           <= 0;
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= 0;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
