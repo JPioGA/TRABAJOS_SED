@@ -8,11 +8,11 @@ entity Button is
 			CLK100MHZ	: in     std_logic;
 			BTNC		: in     std_logic;
 			CPU_RESETN	: in     std_logic;
-			BUTTON_PUSHED:out	 std_logic;
+			BUTTON_PUSHED:out	 std_logic
 		);
 end Button;
 
-architecture structural of Button_UP is
+architecture structural of Button is
 
     component synchrnzr
         port (
