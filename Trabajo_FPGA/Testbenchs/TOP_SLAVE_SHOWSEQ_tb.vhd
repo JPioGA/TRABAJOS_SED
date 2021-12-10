@@ -8,7 +8,7 @@ end SLAVE_SHOWSEQ_tb;
 
 architecture tb of SLAVE_SHOWSEQ_tb is
 
-component FSM_1_SLAVE_SHOWSEQ
+component FSM_1_SLAVE_SHOWSEQ_TOP 
     port (
         CLK                     : in STD_LOGIC;
         RST_N                   : in STD_LOGIC;
@@ -18,12 +18,8 @@ component FSM_1_SLAVE_SHOWSEQ
         START_SHOWSEQ           : in std_logic;
         PARAM_SHOWSEQ_sequence  : in natural_vector;
         PARAM_SHOWSEQ_size      : in natural;
-        DONE_SHOWSEQ            : out std_logic;
-
-        -- SLAVE SHOWSEQ-SLAVE WAITLED interface
-        START_WAITLED   : out std_logic;
-        PARAM_WAITLED   : out natural; -- Número de ciclos de reloj a esperar
-        DONE_WAITLED    : in std_logic
+        DONE_SHOWSEQ            : out std_logic
+    );
 end component;
 signal  CLK_tb                  :  STD_LOGIC:='0';
 signal  RSTN_tb                 :  STD_LOGIC;
@@ -32,30 +28,12 @@ signal  START_SHOWSEQ_tb        :  std_logic;
 signal  SEQ_tb                  :  natural_vector:=(1,4,2,3,others=>0);
 signal  SIZE_tb                 :  natural:=3;
 signal  DONE_SHOWSEQ_tb         :  std_logic;
-signal  START_WAIT_tb			:  std_logic;
-signal  WAITLED_tb				:  natural;
-signal  DONE_WAIT_tb			:  std_logic;
+
 
 begin
-uut : FSM_1_SLAVE_SHOWSEQ port map (CLK_tb, RSTN_tb, LED_tb, START_SHOWSEQ_tb, SEQ_tb, SIZE_tb, DONE_SHOWSEQ_tb,START_WAIT_tb,WAITLED_tb,DONE_WAIT_tb);
+uut : FSM_1_SLAVE_SHOWSEQ_TOP port map (CLK_tb, RSTN_tb, LED_tb, START_SHOWSEQ_tb, SEQ_tb, SIZE_tb, DONE_SHOWSEQ_tb);
 
 CLK_tb<=not CLK_tb after 5ns;
-
-process(START_WAIT_tb)
-variable i: natural :=0;
-begin
-if falling_edge (START_WAIT_tb) then
-DONE_WAIT_tb <= '1';
-end if;
-if DONE_WAIT_tb <= '1' then 
-        assert LED_tb=SEQ(i)
-		report "Salida incorrecta"
-		severity failure;
-i:=i+1;
-wait for 5ns;
-DONE_WAIT_tb<='0';
-end if;
-end process;
 
 process
 begin
@@ -80,4 +58,3 @@ wait;
 		  
 end process;
 end;
-
