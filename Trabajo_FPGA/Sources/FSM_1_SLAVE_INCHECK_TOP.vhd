@@ -9,7 +9,10 @@ use IEEE.NUMERIC_STD.ALL;
 
 
 entity FSM_1_SLAVE_INCHECK_TOP is
-    port ( );
+    port (
+        CLK         : in std_logic;
+        RST_N       : in std_logic
+    );
 end FSM_1_SLAVE_INCHECK_TOP;
 
 architecture Behavioral of FSM_1_SLAVE_INCHECK_TOP is
