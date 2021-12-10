@@ -6,7 +6,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-
+use work.tipos_esp.ALL;
 
 entity FSM_1_SLAVE_INCHECK is
     generic(
@@ -17,8 +17,8 @@ entity FSM_1_SLAVE_INCHECK is
         CLK                     : in STD_LOGIC;
         RST_N                   : in STD_LOGIC;
         START_INCHECK           : in std_logic;
-        PARAM_INCHECK_size      : in natural; -- SIZE. Tama√±o de la secuencia actual
-        PARAM_INCHECK_seq       : in natural(0 to MAX_ROUND-1); -- SEQ. Secuencia actual
+        PARAM_INCHECK_size      : in natural; -- SIZE. TamaÒo de la secuencia actual
+        PARAM_INCHECK_seq       : in natural_vector; -- SEQ. Secuencia actual
         DONE_INCHECK            : out natural; -- 0: none; 1: NO OK; 2: name
         UP_BUTTON               : in std_logic;
         DOWN_BUTTON             : in std_logic;
@@ -31,22 +31,22 @@ end FSM_1_SLAVE_INCHECK;
 
 architecture Behavioral of FSM_1_SLAVE_INCHECK is	
 	type STATE_T is (
-	    S3_WT,  -- S3_WT: Estado de STANDBY. Cuando la m√°quian de estados no est√° en uso.
-		S3_0,	-- S3_0: ESPERA al INPUT. Hasta que no se pulse un bot√≥n no se comprueba si es correcto o no.
+	    S3_WT,  -- S3_WT: Estado de STANDBY. Cuando la m·quian de estados no est· en uso.
+		S3_0,	-- S3_0: ESPERA al INPUT. Hasta que no se pulse un botÛn no se comprueba si es correcto o no.
 		S3_1,   -- S3_1: LED 1 ON
 		S3_2,   -- S3_2: LED 2 ON
 		S3_3,	-- S3_3: LED 3 ON
 		S3_4,   -- S3_4: LED 4 ON
-		S3_5,   -- S3_5: COMPROBACI√ìN del INPUT
+		S3_5,   -- S3_5: COMPROBACI”N del INPUT
 		S3_6,	-- S3_6: INPUTS OK: El jugador ha introducido todos los valores correctamente.
-		S3_7	-- S3_7: GAME OVER. El jugador ha perdido por fin del tiempo o por error en el input. Se muestra animaci√≥n de fin de juego
+		S3_7	-- S3_7: GAME OVER. El jugador ha perdido por fin del tiempo o por error en el input. Se muestra animaciÛn de fin de juego
 	);
     signal cur_state    : STATE_T;    -- Estado actual
 	signal nxt_state	: STATE_T;    -- Estado siguiente
 begin
     state_register: process(CLK, RST_N)
 	begin
-		if RST_N = '0' then -- Si entra un reset, mandar a reposo la m√°quina de estados
+		if RST_N = '0' then -- Si entra un reset, mandar a reposo la m·quina de estados
 			cur_state <= S3_WT;
 		elsif rising_edge(CLK) then
 			cur_state <= nxt_state;
@@ -55,7 +55,7 @@ begin
     
     
     nxt_state_decoder: process(cur_state, UP_BUTTON, DOWN_BUTTON, RIGHT_BUTTON, LEFT_BUTTON)
-        variable button_pushed : natural := 0; -- Variable auxiliar de comprobaci√≥n de bot√≥n pulsado
+        variable button_pushed : natural := 0; -- Variable auxiliar de comprobaciÛn de botÛn pulsado
         variable i : natural := 0;    -- Elemento iterador
     begin
         nxt_state <= cur_state;
@@ -63,11 +63,11 @@ begin
         case cur_state is
             when S3_WT =>
                 if START_INCHECK = '1' then
-                    nxt_state <= S3_0; --Comienzo de la comprobaci√≥n
+                    nxt_state <= S3_0; --Comienzo de la comprobaciÛn
                 end if;
                 
             when S3_0 =>
-                if UP_BUTTON = '1' then
+                if UP_BUTTON = '1' then -- Ponerlo como rising_edge
                     button_pushed := 1;
                     nxt_state <= S3_1;
                 elsif DOWN_BUTTON = '1' then
@@ -98,12 +98,12 @@ begin
                 nxt_state <= S3_5;
                 
             when S3_5 =>
-                if (button_pushed = PARAM_INCHECK_seq(i)) AND (i < (PARAM_INCHECK_size - 1)) then -- Pulsaci√≥n correcta
+                if (button_pushed = PARAM_INCHECK_seq(i)) AND (i < (PARAM_INCHECK_size - 1)) then -- PulsaciÛn correcta
                     i := i + 1;
                     nxt_state <= S3_0;
-                elsif (button_pushed = PARAM_INCHECK_seq(i)) AND (i = (PARAM_INCHECK_size - 1)) then -- Pulsaci√≥n correcta y fin de comprobaci√≥n
+                elsif (button_pushed = PARAM_INCHECK_seq(i)) AND (i = (PARAM_INCHECK_size - 1)) then -- PulsaciÛn correcta y fin de comprobaciÛn
                     nxt_state <= S3_7;
-                else -- Pulsaci√≥n incorrecta
+                else -- PulsaciÛn incorrecta
                     nxt_state <= S3_6;
                 end if;
                 
@@ -122,7 +122,7 @@ begin
             when others =>
                 i := 0;
                 button_pushed := 0;
-                nxt_state <= S3_WT; -- En caso de erro, mandar a reposo la m√°quina de estado
+                nxt_state <= S3_WT; -- En caso de erro, mandar a reposo la m·quina de estado
         end case;
     end process nxt_state_decoder;
     
@@ -158,7 +158,7 @@ begin
                 DONE_INCHECK <= 1; -- Se ha cometido un error.
             when S3_7 =>
                 LED_VALUE    <= 0;
-                DONE_INCHECK <= 2; -- Comprobaci√≥n completa OK
+                DONE_INCHECK <= 2; -- ComprobaciÛn completa OK
             when others =>
                 LED_VALUE    <= 0;
                 DONE_INCHECK <= 0;
@@ -166,30 +166,3 @@ begin
     end process output_decoder;
 end Behavioral;
 
-
-
-
-
-
-
-
---Espera a introducir un valor por los botones (utilizar un flag que indique que se ha introducido un valor)
-				-- LECTURA Y ACTIVACI√ìN DEL FLAG. TAMBI√âN MANDAR MENSAJES DE LOS LEDS PULSADOS AL VISUALIZER
-				if DONE = '1' then
-					nxt_state <= S6; -- GAME OVER: fin del tiempo del temporizador
-				elsif (flag_button_pushed = '1') then
-					flag_button_pushed = '0'; -- Reinicio el flag
-					nxt_state <= S5; -- Se introfujo un valor
-				end if;
-				
-
-
-if (check_input(player_in, game_sequence(i)) = '1') and (i < cur_size-1) then
-					i := i + 1;
-					nxt_state <= S4; -- Se introdujo el valor correcto. A√∫n no ha terminado la secuencia
-				elsif (check_input(player_in, game_sequence(i)) = '1') and (i = cur_size-1) then
-					i := 0; --OJO! Esto tambi√©n se hace en S1. No se si afecta
-					nxt_state <= S1; -- Se introdujo el valor correcto. Ha terminado la secuencia. Comienza nueva ronda
-				elsif (check_input(player_in, game_sequence(i)) = '0') then
-					nxt_state <= S6; -- GAME OVER: Error del jugador.
-				end if;

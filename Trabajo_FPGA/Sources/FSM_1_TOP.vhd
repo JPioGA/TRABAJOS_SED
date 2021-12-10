@@ -1,18 +1,21 @@
--- MÃ¡quina de estado de control de las fases del juego SimÃ³n Dice.
+----------------------------------------------------------------------------------
+-- Máquina de estado de control de las fases del juego Simón Dice.
 -- Compuesta por:
--- 		FSM_1_MASTER: que irÃ¡ evolucionando segÃºn las interacciÃ³n con el ususario
---		FSM_1_SLAVE_SHOWSEQ:
---      FSM_1_SLAVE_INCHECK:
+-- 		FSM_1_MASTER: que irá evolucionando según las interacción con el ususario
+--      FSM_1_WAITLED: 
+--		FSM_1_SLAVE_SHOWSEQ_TOP:
+--      FSM_1_SLAVE_INCHECK_TOP:
 --      FSM_1_SLAVE_TIMER:
+----------------------------------------------------------------------------------
 
 
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
 
 entity FSM_1_TOP is
 end FSM_1_TOP;
-
 
 
 architecture structural of FSM_1_TOP is
@@ -25,8 +28,16 @@ architecture structural of FSM_1_TOP is
 		  
 		);
 	end component;
-
-	component FSM_1_SLAVE_SHOWSEQ is
+	
+    component FSM_1_SLAVE_WAITLED is
+		port (
+		  CLK     : in  std_logic;
+		  RST_N   : in  std_logic;
+		  
+		);
+	end component;
+	
+	component FSM_1_SLAVE_SHOWSEQ_TOP is
 		port (
 		  CLK     : in  std_logic;
 		  RST_N   : in  std_logic;
@@ -34,7 +45,7 @@ architecture structural of FSM_1_TOP is
 		);
 	end component;
 
-	component FSM_1_SLAVE_INCHECK is
+	component FSM_1_SLAVE_INCHECK_TOP is
 		port (
 		  CLK     : in  std_logic;
 		  RST_N   : in  std_logic;
@@ -57,14 +68,14 @@ begin
 		  
 		);
 	
-	incheck: FSM_1_SLAVE_SHOWSEQ
+	showseq: FSM_1_SLAVE_SHOWSEQ_TOP
 		port map (
 		  CLK     => ,
 		  RST_N   => ,
 		  
 		);
 	
-	incheck: FSM_1_SLAVE_INCHECK
+	incheck: FSM_1_SLAVE_INCHECK_TOP
 		port map (
 		  CLK     => ,
 		  RST_N   => ,
