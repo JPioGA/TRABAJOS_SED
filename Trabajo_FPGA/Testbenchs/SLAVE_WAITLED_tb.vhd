@@ -2,10 +2,10 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 
-entity SLAVE_WAITEL_tb is
-end SLAVE_WAITEL_tb;
+entity SLAVE_WAITLED_tb is
+end SLAVE_WAITLED_tb;
 
-architecture tb of SLAVE_WAITEL_tb is
+architecture tb of SLAVE_WAITLED_tb is
 component FSM_1_SLAVE_WAITLED
 port(
         CLK		      :	in 	std_logic; -- Entrada de RELOJ
@@ -37,13 +37,13 @@ START_tb<='0';
 		wait for 10ns;
 		START_tb<='0';
 		
-		wait for 20ns;
+		wait for 60ns;
 		
-		assert DONE_tb=1
+		assert DONE_tb='1'
 		report "Tiempo fallido"
 		severity failure;
 		
-wait for 200ns;
+wait for 100ns;
 RSTN_tb<='0';
 
 		assert false
