@@ -70,4 +70,12 @@ begin
         PARAM_WAITLED           => param_wait,
         DONE_WAITLED            => done_wait
     );
+        instance_waitled: FSM_1_SLAVE_WAITLED port map(
+        CLK             => CLK,
+        RST_N           => RST_N,
+        START_WAITLED   => start_wait,
+        PARAM_WAITLED   => param_wait,
+        DONE_WAITLED    => done_wait
+    );
+end structural;
     
