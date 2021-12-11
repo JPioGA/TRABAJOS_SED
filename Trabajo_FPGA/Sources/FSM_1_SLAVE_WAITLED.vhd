@@ -1,3 +1,10 @@
+----------------------------------------------------------------------------------
+-- FSM_1_SLAVE_WAITLED
+-- Esta es una máquina de estados encargada de realizar las esperas para mantener
+-- los LEDS o DISPLAYS encendidos durante un tiempo determinado.
+----------------------------------------------------------------------------------
+
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;

@@ -50,21 +50,9 @@ end FSM_1_MASTER;
 
 
 architecture Behavioral of FSM_1_MASTER is
-    -- Declaración de tipos y señales utilizadas
-	type STATE_T is (
-		S0_WT,	-- S0_WT: ESPERA INICIO DE JUEGO. Hasta que no se pulse OK_BUTTON no se pasa al estado S0.
-		S0,		-- S0: START GAME. Se muestra una animación que indica el inicio del juego.
-		S1,		-- S1: ADD VALUE. Adición de un nuevo valor a la secuencia
-		S2,		-- S2: SHOW SEQUENCE. Activación de la FSM SLAVE SHOWSEQ. Muestra por los LEDS la secuencia que tendrá que introducir el jugador.
-		S3,     -- S3: GO ANIMATION: Animación que indica que el jugador comience a introducir sus inputs.
-		S4,		-- S3: START INCHECK Y TIMER. Disparo del temporizador tras mostrar la secuencia, Y activación de la comprobación de los inputs del jugador.
-		S5,		-- S4: INPUTS OK: El jugador ha introducido todos los valores correctamente.
-		S6		-- S5: GAME OVER. El jugador ha perdido por fin del tiempo o por error en el input. Se muestra animación de fin de juego
-	);
-	subtype BUTTON_T is integer range 1 to 4; -- 1: UP_BUTTON	2: DOWN_BUTTON	3: RIGHT_BUTTON	4: LEFT_BUTTON	  (El subtipo está hecho para ahorrar recursos en la síntesis)
-	
-	signal cur_state	 : STATE_T;				-- Estado actual
-	signal nxt_state	 : STATE_T;				-- Estado siguiente
+    -- Declaración de señales utilizadas	
+	signal cur_state	 : STATE_MASTER_T;				-- Estado actual
+	signal nxt_state	 : STATE_MASTER_T;				-- Estado siguiente
 	signal game_sequence : natural_vector;	-- Vector que contendrá en sus elementos los valores aleatorios a adivinar por el jugador.
 	signal size          : natural := 0;
 	

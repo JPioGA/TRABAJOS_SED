@@ -1,8 +1,8 @@
 ----------------------------------------------------------------------------------
 -- Máquina de estado de control de las fases del juego Simón Dice.
 -- Compuesta por:
--- 		FSM_1_MASTER: que irá evolucionando según las interacción con el ususario
---      FSM_1_WAITLED: 
+-- 		FSM_1_MASTER: Evolución general del juego
+--      FSM_1_WAITLED: Contador para realizar esperas de encendido de leds y mensajes
 --		FSM_1_SLAVE_SHOWSEQ_TOP:
 --      FSM_1_SLAVE_INCHECK_TOP:
 --      FSM_1_SLAVE_TIMER:

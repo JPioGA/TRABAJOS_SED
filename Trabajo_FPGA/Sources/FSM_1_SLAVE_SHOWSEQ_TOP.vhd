@@ -1,3 +1,9 @@
+----------------------------------------------------------------------------------
+-- Entidad TOP del SLAVE SHOWSEQ.
+-- Se conecta el otro slave WAITLED para realizar las esperas de los estados
+-- en los que se encienden los LEDS durante unos segundos.
+----------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -8,15 +14,13 @@ entity FSM_1_SLAVE_SHOWSEQ_TOP is
         CLK                     : in STD_LOGIC;
         RST_N                   : in STD_LOGIC;
         LED_VALUE               : out natural; --LED a bit
-        STATE_TOP               : out STATE_T;
+        STATE_TOP               : out STATE_SHOWSEQ_T;
         
         -- MASTER-SLAVE SHOWSEQ interface
         START_SHOWSEQ           : in std_logic;
         PARAM_SHOWSEQ_sequence  : in natural_vector;
         PARAM_SHOWSEQ_size      : in natural;
-        DONE_SHOWSEQ            : out std_logic;
-        START_WAITLED           : out std_logic;
-        DONE_WAITLED            : out std_logic
+        DONE_SHOWSEQ            : out std_logic
     );
 end FSM_1_SLAVE_SHOWSEQ_TOP;
 
@@ -26,7 +30,7 @@ architecture structural of FSM_1_SLAVE_SHOWSEQ_TOP is
             CLK                     : in STD_LOGIC;
             RST_N                   : in STD_LOGIC;
             LED_VALUE               : out natural; --LED a bit 
-            STATE                   : out STATE_T;    
+            STATE                   : out STATE_SHOWSEQ_T;    
             -- MASTER-SLAVE SHOWSEQ interface
             START_SHOWSEQ           : in std_logic;
             PARAM_SHOWSEQ_sequence  : in natural_vector;
@@ -55,13 +59,11 @@ architecture structural of FSM_1_SLAVE_SHOWSEQ_TOP is
    
     
 begin
-    START_WAITLED <= start_wait;
-    DONE_WAITLED <= done_wait;
     instance_showseq: FSM_1_SLAVE_SHOWSEQ port map(
         CLK                     => CLK,
         RST_N                   => RST_N,
         LED_VALUE               => LED_VALUE,
-        STATE                   =>STATE_TOP,
+        STATE                   => STATE_TOP,
         START_SHOWSEQ           => START_SHOWSEQ,
         PARAM_SHOWSEQ_sequence  => PARAM_SHOWSEQ_sequence,
         PARAM_SHOWSEQ_size      => PARAM_SHOWSEQ_size,
@@ -70,7 +72,7 @@ begin
         PARAM_WAITLED           => param_wait,
         DONE_WAITLED            => done_wait
     );
-        instance_waitled: FSM_1_SLAVE_WAITLED port map(
+    instance_waitled: FSM_1_SLAVE_WAITLED port map(
         CLK             => CLK,
         RST_N           => RST_N,
         START_WAITLED   => start_wait,
