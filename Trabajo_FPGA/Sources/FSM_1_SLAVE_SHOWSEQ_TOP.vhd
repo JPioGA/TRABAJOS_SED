@@ -18,7 +18,7 @@ entity FSM_1_SLAVE_SHOWSEQ_TOP is
         
         -- MASTER-SLAVE SHOWSEQ interface
         START_SHOWSEQ           : in std_logic;
-        PARAM_SHOWSEQ_sequence  : in natural_vector;
+        PARAM_SHOWSEQ_seq       : in natural_vector;
         PARAM_SHOWSEQ_size      : in natural;
         DONE_SHOWSEQ            : out std_logic
     );
@@ -65,7 +65,7 @@ begin
         LED_VALUE               => LED_VALUE,
         STATE                   => STATE_TOP,
         START_SHOWSEQ           => START_SHOWSEQ,
-        PARAM_SHOWSEQ_sequence  => PARAM_SHOWSEQ_sequence,
+        PARAM_SHOWSEQ_sequence  => PARAM_SHOWSEQ_seq,
         PARAM_SHOWSEQ_size      => PARAM_SHOWSEQ_size,
         DONE_SHOWSEQ            => DONE_SHOWSEQ,
         START_WAITLED           => start_wait,
