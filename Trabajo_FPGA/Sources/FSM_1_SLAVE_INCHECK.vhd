@@ -16,7 +16,7 @@ entity FSM_1_SLAVE_INCHECK is
         DOWN_BUTTON             : in std_logic;
         RIGHT_BUTTON            : in std_logic;
         LEFT_BUTTON             : in std_logic;
-        BUTTON_PUSHED           : out natural; --A�adido para control de botones (tb)
+        BUTTON_PUSHED_INCHECK   : out natural; --A�adido para control de botones (tb)
         LED_VALUE               : out natural; --LED a encender
         STATE_INCHECK           : out STATE_INCHECK_T; -- Estado actual de la máquina
         
@@ -38,6 +38,7 @@ end FSM_1_SLAVE_INCHECK;
 architecture Behavioral of FSM_1_SLAVE_INCHECK is	
     signal cur_state    : STATE_INCHECK_T;    -- Estado actual
 	signal nxt_state	: STATE_INCHECK_T;    -- Estado siguiente
+    signal button_pushed: natural;
 begin
     state_register: process(CLK, RST_N)
 	begin
@@ -50,7 +51,6 @@ begin
     
     
     nxt_state_decoder: process(cur_state, START_INCHECK, DONE_WAITLED, UP_BUTTON, DOWN_BUTTON, RIGHT_BUTTON, LEFT_BUTTON)
-        variable button_pushed : natural := 0; -- Variable auxiliar de comprobación de botón pulsado
         variable i : natural := 0;    -- Elemento iterador
     begin
         nxt_state <= cur_state;
@@ -63,16 +63,16 @@ begin
                 
             when S3_0 =>
                 if UP_BUTTON = '1' then -- Ponerlo como rising_edge
-                    button_pushed := 1;
+                    button_pushed <= 1;
                     nxt_state <= S3_1;
                 elsif DOWN_BUTTON = '1' then
-                    button_pushed := 2;
+                    button_pushed <= 2;
                     nxt_state <= S3_2;
                 elsif RIGHT_BUTTON = '1' then
-                    button_pushed := 3;
+                    button_pushed <= 3;
                     nxt_state <= S3_3;
                 elsif LEFT_BUTTON  = '1' then
-                    button_pushed := 4;
+                    button_pushed <= 4;
                     nxt_state <= S3_4;
                 end if;
 
@@ -106,21 +106,21 @@ begin
             when S3_6 =>
                 -- Reinicio de las variables auxiliasres
                 i := 0;
-                button_pushed := 0;
+                button_pushed <= 0;
                 nxt_state <= S3_STBY;
                 
             when S3_7 =>
                 -- Reinicio de las variables auxiliasres
                 i := 0;
-                button_pushed := 0;
+                button_pushed <= 0;
                 nxt_state <= S3_STBY;
                 
             when others =>
                 i := 0;
-                button_pushed := 0;
+                button_pushed <= 0;
                 nxt_state <= S3_STBY; -- En caso de erro, mandar a reposo la máquina de estado
         end case;
-        BUTTON_PUSHED:=button_pushed;
+        BUTTON_PUSHED_INCHECK<=button_pushed;
         STATE_INCHECK<=cur_state;
         
     end process nxt_state_decoder;

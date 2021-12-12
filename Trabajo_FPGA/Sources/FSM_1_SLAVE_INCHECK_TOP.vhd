@@ -1,8 +1,3 @@
-----------------------------------------------------------------------------------
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -16,7 +11,10 @@ entity FSM_1_SLAVE_INCHECK_TOP is
         DOWN_BUTTON             : in std_logic;
         RIGHT_BUTTON            : in std_logic;
         LEFT_BUTTON             : in std_logic;
+        BUTTON_PUSHED           : out natural;
         LED_VALUE               : out natural; --LED a encender
+        STATE_INCHECK           : out STATE_INCHECK_T;
+
         
         -- MASTER-SLAVE INCHECK interfece
         START_INCHECK           : in std_logic;
@@ -35,7 +33,9 @@ architecture Behavioral of FSM_1_SLAVE_INCHECK_TOP is
             DOWN_BUTTON             : in std_logic;
             RIGHT_BUTTON            : in std_logic;
             LEFT_BUTTON             : in std_logic;
+            BUTTON_PUSHED_INCHECK   : out natural;
             LED_VALUE               : out natural; --LED a encender
+            STATE_INCHECK           : out STATE_INCHECK_T;
             
             -- MASTER-SLAVE INCHECK interfece
             START_INCHECK           : in std_logic;
@@ -71,7 +71,9 @@ begin
         DOWN_BUTTON             => DOWN_BUTTON,
         RIGHT_BUTTON            => RIGHT_BUTTON,
         LEFT_BUTTON             => LEFT_BUTTON,
+        BUTTON_PUSHED_INCHECK   => BUTTON_PUSHED,
         LED_VALUE               => LED_VALUE,
+        STATE_INCHECK           => STATE_INCHECK,
         -- MASTER-SLAVE INCHECK interfece
         START_INCHECK           => START_INCHECK,
         PARAM_INCHECK_size      => PARAM_INCHECK_size,
