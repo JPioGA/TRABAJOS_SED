@@ -2,14 +2,20 @@ package tipos_esp is
      type natural_vector is array (0 to 98) of natural;
      subtype BUTTON_T is natural range 1 to 4; -- 1: UP_BUTTON	2: DOWN_BUTTON	3: RIGHT_BUTTON	4: LEFT_BUTTON	  (El subtipo está hecho para ahorrar recursos en la síntesis)
      type STATE_MASTER_T is (
-            S0_WT,	-- S0_WT: ESPERA INICIO DE JUEGO. Hasta que no se pulse OK_BUTTON no se pasa al estado S0.
+            S0_STBY,-- S0_STBY: ESPERA INICIO DE JUEGO. Hasta que no se pulse OK_BUTTON no se pasa al estado S0.
             S0,		-- S0: START GAME. Se muestra una animación que indica el inicio del juego.
+            S0_WT,  -- S0_WT: Estado de espera de muestra del mensaje GO ANIMATION
             S1,		-- S1: ADD VALUE. Adición de un nuevo valor a la secuencia
             S2,		-- S2: SHOW SEQUENCE. Activación de la FSM SLAVE SHOWSEQ. Muestra por los LEDS la secuencia que tendrá que introducir el jugador.
+            S2_WT,  -- S2_WT: Estado de espera hasta la terminación de la muestra de la secuencia por SHOWSEQ
             S3,     -- S3: GO ANIMATION: Animación que indica que el jugador comience a introducir sus inputs.
+            S3_WT,  -- S3_WT :Estado de espera de muestra del mensaje GO ANIMATION
             S4,		-- S3: START INCHECK Y TIMER. Disparo del temporizador tras mostrar la secuencia, Y activación de la comprobación de los inputs del jugador.
+            S4_WT,  -- S4_WT: Estado de espera en el que se realiza la interacción con el jugador
             S5,		-- S4: INPUTS OK: El jugador ha introducido todos los valores correctamente.
-            S6		-- S5: GAME OVER. El jugador ha perdido por fin del tiempo o por error en el input. Se muestra animación de fin de juego
+            S5_WT,  -- S5_WT: Estado de espera de muestra del mensaje OK INPUT SEQUENCE
+            S6,		-- S5: GAME OVER. El jugador ha perdido por fin del tiempo o por error en el input. Se muestra animación de fin de juego
+            S6_WT   -- S6_WT: Estado de espera de muestra del mensaje GAME OVER
         );
      type STATE_SHOWSEQ_T is (
             S2_STBY,  -- S2_STBY: Estado de STANDBY. Cuando la máquian de estados no está en uso.

@@ -13,8 +13,9 @@ use work.tipos_esp.ALL;
 entity FSM_1_MASTER is
     generic(
         MAX_ROUND   : natural := 99;
-        COLORS      : natural := 4
-    );
+        COLORS      : natural := 4;
+        TIME_WAIT   : natural := 2
+        );
     port (
         -- General MASTER interface
         CLK         : in std_logic;
@@ -30,7 +31,7 @@ entity FSM_1_MASTER is
         
         -- MASTER-SLAVE SHOWSEQ interface
         START_SHOWSEQ           : out std_logic;
-        PARAM_SHOWSEQ_sequence  : out natural_vector;
+        PARAM_SHOWSEQ_seq  : out natural_vector;
         PARAM_SHOWSEQ_size      : out natural;
         DONE_SHOWSEQ            : in std_logic;
         
@@ -93,7 +94,7 @@ begin
 		
 		-- Transiciones de estado y cambio de variables internas para el funcionamiento del juego
 		case cur_state is
-			when S0_WT =>
+			when S0_STBY =>
 				if OK_BUTTON = '1' then
 					nxt_state <= S0;
 				end if;
@@ -101,12 +102,13 @@ begin
 				i := 0;
 				size <= 0;
 				
-				
 			when S0 =>
-				wait for 3000 ms; -- Animación STAR GAME
-				nxt_state <= S1;
-				
-				
+				nxt_state <= S0_WT;
+			when S0_WT =>
+			     if DONE_WAITLED = '1' then
+			         nxt_state <= S1;
+			     end if;
+			     
 			when S1 =>
 				-- Adición de un nuevo elemento a la secuencia
 				size <= size + 1;
@@ -114,36 +116,46 @@ begin
 				i := 0;
 				nxt_state <= S2;
 				
-				
-			when S2 =>
+			when S2 => 
+			     nxt_state <= S2_WT;	
+			when S2_WT =>
 				if DONE_SHOWSEQ = '1' then -- Tras terminar de mostrar la secuencia, paso al siguiente estado
 				   nxt_state <= S3; 
 				end if;
 				
 			when S3 =>
-			    wait for 3000 ms; -- Animación GO INPUT
-				nxt_state <= S4;
+				nxt_state <= S4; -- Activación de animación GO ANIMATION	
+			when S3_WT =>
+			    if DONE_WAITLED = '1' then
+			         nxt_state <= S4;
+			     end if;
 				
-				
+					
 			when S4 =>
-				if (DONE_INCHECK = 1) OR (DONE_TIMER = '1') then
+				nxt_state <= S4_WT; -- Activación de las SLAVES INCHECK y TIMER
+			when S4_WT => 
+			     if (DONE_INCHECK = 1) OR (DONE_TIMER = '1') then
 				   nxt_state <= S6; -- GAME OVER
 				elsif DONE_INCHECK = 2 then
 				   nxt_state <= S5; --INPUT SEQUENCE OK
 				end if;
 				
 			when S5 =>
-				wait for 3000 ms; -- Animación de SEQ OK
-				nxt_state <= S1;
+				nxt_state <= S5_WT; -- Activación de animación OK INPUT SEQUENCE
+			when S5_WT =>
+			     if DONE_WAITLED = '1' then
+			         nxt_state <= S1;
+			     end if;
 				
 			when S6 =>
-			    wait for 3000 ms; -- Animación de GAME OVER
-				nxt_state <= S0_WT;
+				nxt_state <= S6_WT;
+			when S6_WT =>
+			     if DONE_WAITLED = '1' then
+			         nxt_state <= S0_STBY;
+			     end if;
 				
-				
-			
 			when others =>
-				nxt_state <= S0_WT; -- En caso de fallo, volver al estado de espera.	
+				nxt_state <= S0_STBY; -- En caso de fallo, volver al estado de espera.	
 		end case;	
 	end process;
 	
@@ -155,9 +167,12 @@ begin
 		-- General MASTER interface
 		ROUND                   <= 0;
 		OUT_MESSAGE             <= 0;
+		 -- MASTER-SLAVE WAIT interface
+        START_WAITLED           <= '0';
+        PARAM_WAITLED           <= 0;
 		-- MASTER-SLAVE SHOWSEQ interface
 		START_SHOWSEQ           <= '0';
-        PARAM_SHOWSEQ_sequence  <= (others => 0);
+        PARAM_SHOWSEQ_seq       <= (others => 0);
         PARAM_SHOWSEQ_size      <= 0;
         -- MASTER-SLAVE INCHECK interface
         START_INCHECK           <= '0';
@@ -169,13 +184,16 @@ begin
         RST_COUNT               <= '0';
 		
 		case cur_state is
-			when S0_WT =>
+			when S0_STBY =>
 				-- General MASTER interface
                 ROUND                   <= 0;
-                OUT_MESSAGE             <= 1;
+                OUT_MESSAGE             <= 1; --START ANIMATION
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0);
+                PARAM_SHOWSEQ_seq  <= (others => 0);
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
@@ -190,9 +208,12 @@ begin
 				-- General MASTER interface
                 ROUND                   <= 0;
                 OUT_MESSAGE             <= 0;
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '1';
+                PARAM_WAITLED           <= TIME_WAIT;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0);
+                PARAM_SHOWSEQ_seq  <= (others => 0);
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
@@ -202,14 +223,37 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
-				
+			
+			when S0_WT =>
+				-- General MASTER interface
+                ROUND                   <= 0;
+                OUT_MESSAGE             <= 0;
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
+                -- MASTER-SLAVE SHOWSEQ interface
+                START_SHOWSEQ           <= '0';
+                PARAM_SHOWSEQ_seq  <= (others => 0);
+                PARAM_SHOWSEQ_size      <= 0;
+                -- MASTER-SLAVE INCHECK interface
+                START_INCHECK           <= '0';
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= (others => 0);
+                -- MASTER-SLAVE TIMER interface
+                START_TIMER             <= '0';
+                PARAM_TIMER             <= 0;
+                RST_COUNT               <= '0';
+                
 			when S1 =>
 				-- General MASTER interface
                 ROUND                   <= 0;
                 OUT_MESSAGE             <= 0;
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0);
+                PARAM_SHOWSEQ_seq  <= (others => 0);
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
@@ -222,11 +266,14 @@ begin
 				
 			when S2 =>
 				-- General MASTER interface
-                ROUND                   <= 0;
+                ROUND                   <= size;
                 OUT_MESSAGE             <= 0;
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '1'; -- Se inicia el esclavo de muestra de la secuencia
-                PARAM_SHOWSEQ_sequence  <= game_sequence;
+                PARAM_SHOWSEQ_seq       <= game_sequence;
                 PARAM_SHOWSEQ_size      <= size;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
@@ -237,13 +284,16 @@ begin
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
 			
-			when S3 =>
-				-- General MASTER interface
-                ROUND                   <= 0;
-                OUT_MESSAGE             <= 2; -- GO ANIMATION
+			when S2_WT =>
+			    -- General MASTER interface
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 0;
+                 -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0);
+                PARAM_SHOWSEQ_seq       <= (others => 0);
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
@@ -253,14 +303,57 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
-                	
-			when S4 =>
+
+			when S3 =>
 				-- General MASTER interface
-                ROUND                   <= 0;
-                OUT_MESSAGE             <= 0;
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 2; -- GO ANIMATION
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '1';
+                PARAM_WAITLED           <= TIME_WAIT;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0);
+                PARAM_SHOWSEQ_seq  <= (others => 0);
+                PARAM_SHOWSEQ_size      <= 0;
+                -- MASTER-SLAVE INCHECK interface
+                START_INCHECK           <= '0';
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= (others => 0);
+                -- MASTER-SLAVE TIMER interface
+                START_TIMER             <= '0';
+                PARAM_TIMER             <= 0;
+                RST_COUNT               <= '0';
+            
+            when S3_WT =>
+                -- General MASTER interface
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 2;
+                 -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
+                -- MASTER-SLAVE SHOWSEQ interface
+                START_SHOWSEQ           <= '0';
+                PARAM_SHOWSEQ_seq  <= (others => 0);
+                PARAM_SHOWSEQ_size      <= 0;
+                -- MASTER-SLAVE INCHECK interface
+                START_INCHECK           <= '0';
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= (others => 0);
+                -- MASTER-SLAVE TIMER interface
+                START_TIMER             <= '0';
+                PARAM_TIMER             <= 0;
+                RST_COUNT               <= '0';
+            	
+			when S4 =>
+				-- General MASTER interface
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 0;
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
+                -- MASTER-SLAVE SHOWSEQ interface
+                START_SHOWSEQ           <= '0';
+                PARAM_SHOWSEQ_seq  <= (others => 0);
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '1';
@@ -270,14 +363,37 @@ begin
                 START_TIMER             <= '1';
                 PARAM_TIMER             <= size; --Según numero de rondas, varía el tiempo
                 RST_COUNT               <= '0';
-				
+			
+			when S4_WT =>
+                -- General MASTER interface
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 0;
+                 -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
+                -- MASTER-SLAVE SHOWSEQ interface
+                START_SHOWSEQ           <= '0';
+                PARAM_SHOWSEQ_seq  <= (others => 0);
+                PARAM_SHOWSEQ_size      <= 0;
+                -- MASTER-SLAVE INCHECK interface
+                START_INCHECK           <= '0';
+                PARAM_INCHECK_size      <= size;
+                PARAM_INCHECK_seq       <= game_sequence;
+                -- MASTER-SLAVE TIMER interface
+                START_TIMER             <= '0';
+                PARAM_TIMER             <= size;
+                RST_COUNT               <= '0';			
+			
 			when S5 =>
 				-- General MASTER interface
-                ROUND                   <= 0;
-                OUT_MESSAGE             <= 0;
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 3; --OK INPUT ANIMATION
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '1'; 
+                PARAM_WAITLED           <= TIME_WAIT;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0); 
+                PARAM_SHOWSEQ_seq  <= (others => 0); 
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
@@ -287,14 +403,37 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '1';
-				
+			
+			when S5_WT =>
+				-- General MASTER interface
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 3;
+                 -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
+                -- MASTER-SLAVE SHOWSEQ interface
+                START_SHOWSEQ           <= '0';
+                PARAM_SHOWSEQ_seq  <= (others => 0);
+                PARAM_SHOWSEQ_size      <= 0;
+                -- MASTER-SLAVE INCHECK interface
+                START_INCHECK           <= '0';
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= (others => 0);
+                -- MASTER-SLAVE TIMER interface
+                START_TIMER             <= '0';
+                PARAM_TIMER             <= 0;
+                RST_COUNT               <= '0';
+			
 			when S6 =>
 				-- General MASTER interface
-                ROUND                   <= 0;
-                OUT_MESSAGE             <= 0;
+                ROUND                   <= size;
+                OUT_MESSAGE             <= 4; -- GAME OVER ANIMATION
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '1';
+                PARAM_WAITLED           <= TIME_WAIT;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0);
+                PARAM_SHOWSEQ_seq  <= (others => 0);
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
@@ -304,14 +443,36 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '1';
-				
+			
+			when S6_WT =>	
+			    -- General MASTER interface
+                ROUND                   <= 0;
+                OUT_MESSAGE             <= 4;
+                 -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
+                -- MASTER-SLAVE SHOWSEQ interface
+                START_SHOWSEQ           <= '0';
+                PARAM_SHOWSEQ_seq  <= (others => 0);
+                PARAM_SHOWSEQ_size      <= 0;
+                -- MASTER-SLAVE INCHECK interface
+                START_INCHECK           <= '0';
+                PARAM_INCHECK_size      <= 0;
+                PARAM_INCHECK_seq       <= (others => 0);
+                -- MASTER-SLAVE TIMER interface
+                START_TIMER             <= '0';
+                PARAM_TIMER             <= 0;
+                RST_COUNT               <= '0';
 			when others =>
 				-- General MASTER interface
                 ROUND                   <= 0;
                 OUT_MESSAGE             <= 0;
+                -- MASTER-SLAVE WAIT interface
+                START_WAITLED           <= '0';
+                PARAM_WAITLED           <= 0;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_sequence  <= (others => 0);
+                PARAM_SHOWSEQ_seq  <= (others => 0);
                 PARAM_SHOWSEQ_size      <= 0;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';

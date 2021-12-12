@@ -15,7 +15,8 @@ entity FSM_1_SLAVE_TIMER is
         START_TIMER : in std_logic;
         PARAM_TIMER : in natural;
         RST_COUNT   : in std_logic;
-        DONE_TIMER  : out std_logic
+        DONE_TIMER  : out std_logic;
+        COUNT       : out natural
     );
 end FSM_1_SLAVE_TIMER;
 
