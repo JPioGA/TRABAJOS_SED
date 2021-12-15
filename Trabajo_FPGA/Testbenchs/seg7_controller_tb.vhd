@@ -68,13 +68,15 @@ begin
     CLK_tb <= not clk_tb after 5 ns;
     process
     begin
-        selector_tb <= 1;
-        round_7seg_larger_tb <= "0101010";
-        round_7seg_smaller_tb <= "1111111";
-        time_7seg_larger_tb <= "0000000";
-        time_7seg_smaller_tb <= "1001001";
-        for i in 1 to 8 loop
-            wait until CLK_tb = '0';
+            round_7seg_larger_tb <= "0101010";
+            round_7seg_smaller_tb <= "1111111";
+            time_7seg_larger_tb <= "0000000";
+            time_7seg_smaller_tb <= "1001001";
+        for j in 0 to 4 loop
+            selector_tb <= j;
+            for i in 1 to 8*100 loop
+                wait until CLK_tb = '0';
+            end loop;
         end loop;
         assert false
             report "[SUCCESS]: simulation finished."
