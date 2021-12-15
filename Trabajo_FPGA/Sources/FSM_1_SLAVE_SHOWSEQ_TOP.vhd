@@ -13,7 +13,7 @@ entity FSM_1_SLAVE_SHOWSEQ_TOP is
     port (
         CLK                     : in STD_LOGIC;
         RST_N                   : in STD_LOGIC;
-        LED_VALUE               : out natural; --LED a bit
+        LED_VALUE               : out LED_T; --LED a bit
         STATE_TOP               : out STATE_SHOWSEQ_T;
         
         -- MASTER-SLAVE SHOWSEQ interface
@@ -29,7 +29,7 @@ architecture structural of FSM_1_SLAVE_SHOWSEQ_TOP is
         port(
             CLK                     : in STD_LOGIC;
             RST_N                   : in STD_LOGIC;
-            LED_VALUE               : out natural; --LED a bit 
+            LED_VALUE               : out LED_T; --LED a bit 
             STATE                   : out STATE_SHOWSEQ_T;    
             -- MASTER-SLAVE SHOWSEQ interface
             START_SHOWSEQ           : in std_logic;

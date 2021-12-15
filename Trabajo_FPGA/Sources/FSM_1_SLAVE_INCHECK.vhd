@@ -16,8 +16,8 @@ entity FSM_1_SLAVE_INCHECK is
         DOWN_BUTTON             : in std_logic;
         RIGHT_BUTTON            : in std_logic;
         LEFT_BUTTON             : in std_logic;
-        BUTTON_PUSHED_INCHECK   : out natural; --AÒadido para control de botones (tb)
-        LED_VALUE               : out natural; --LED a encender
+        BUTTON_PUSHED_INCHECK   : out BUTTON_T; --AÒadido para control de botones (tb)
+        LED_VALUE               : out LED_T; --LED a encender
         STATE_INCHECK           : out STATE_INCHECK_T; -- Estado actual de la m√°quina
         
         -- MASTER-SLAVE INCHECK interfece
@@ -38,7 +38,7 @@ end FSM_1_SLAVE_INCHECK;
 architecture Behavioral of FSM_1_SLAVE_INCHECK is	
     signal cur_state    : STATE_INCHECK_T;    -- Estado actual
 	signal nxt_state	: STATE_INCHECK_T;    -- Estado siguiente
-    signal button_pushed: natural;
+    signal button_pushed: BUTTON_T;
 begin
     state_register: process(CLK, RST_N)
 	begin

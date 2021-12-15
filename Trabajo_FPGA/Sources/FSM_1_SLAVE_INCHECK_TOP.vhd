@@ -11,8 +11,8 @@ entity FSM_1_SLAVE_INCHECK_TOP is
         DOWN_BUTTON             : in std_logic;
         RIGHT_BUTTON            : in std_logic;
         LEFT_BUTTON             : in std_logic;
-        BUTTON_PUSHED           : out natural;
-        LED_VALUE               : out natural; --LED a encender
+        BUTTON_PUSHED           : out BUTTON_T;
+        LED_VALUE               : out LED_T; --LED a encender
         STATE_INCHECK           : out STATE_INCHECK_T;
 
         
@@ -33,8 +33,8 @@ architecture Behavioral of FSM_1_SLAVE_INCHECK_TOP is
             DOWN_BUTTON             : in std_logic;
             RIGHT_BUTTON            : in std_logic;
             LEFT_BUTTON             : in std_logic;
-            BUTTON_PUSHED_INCHECK   : out natural;
-            LED_VALUE               : out natural; --LED a encender
+            BUTTON_PUSHED_INCHECK   : out BUTTON_T;
+            LED_VALUE               : out LED_T; --LED a encender
             STATE_INCHECK           : out STATE_INCHECK_T;
             
             -- MASTER-SLAVE INCHECK interfece

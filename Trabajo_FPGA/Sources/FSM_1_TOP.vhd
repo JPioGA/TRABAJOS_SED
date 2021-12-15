@@ -64,7 +64,10 @@ architecture structural of FSM_1_TOP is
           START_TIMER         : out std_logic;
           PARAM_TIMER         : out natural;
           RST_COUNT           : out std_logic;
-          DONE_TIMER          : in std_logic
+          DONE_TIMER          : in std_logic;
+          
+          -- MASTER-SLAVE LFSR interface
+          RAND_VALUE          : in LED_T
 		);
 	end component;
 	
@@ -121,6 +124,13 @@ architecture structural of FSM_1_TOP is
 		);
 	end component;
 	
+	component FSM_1_SLAVE_LFSR is
+		port (
+		  CLK          : in  std_logic;
+		  RST_N        : in  std_logic;
+		  RETURN_VALUE : out LED_T
+		);
+	end component;
 	-- SEÑALES DE INTERCONEXIÓN ENTRE COMPONENTES
 	   --Señales MASTER-WAITLED
 	signal wait_start : std_logic;
@@ -141,7 +151,8 @@ architecture structural of FSM_1_TOP is
     signal timer_done       : std_logic;
     signal timer_rst_count  : std_logic;
     signal timer_param      : natural;
-    
+        -- Señales MASTER-LFSR
+    signal random_value : LED_T;
 begin
 	master: FSM_1_MASTER
 		port map (
@@ -168,7 +179,9 @@ begin
           START_TIMER        => timer_start,
           PARAM_TIMER        => timer_param,
           RST_COUNT          => timer_rst_count,
-          DONE_TIMER         => timer_done
+          DONE_TIMER         => timer_done,
+          -- MASTER-SLAVE LFSR interface
+          RAND_VALUE         => random_value
 		);
 		
 	waitled: FSM_1_SLAVE_WAITLED
@@ -219,5 +232,11 @@ begin
           DONE_TIMER => timer_done,
           COUNT => CUR_TIME_top
 		);
+	lfsr: FSM_1_SLAVE_LFSR
+	   port map(
+	       CLK => CLK,
+	       RST_N => RST_N,
+	       RETURN_VALUE => random_value
+	   );
 	
 end structural;

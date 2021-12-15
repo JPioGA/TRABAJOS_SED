@@ -1,15 +1,15 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity edgedtctr is
+entity EDGEDTCTR is
 	port (
 		clk : in std_logic;
 		sync_in : in std_logic;
 		edge : out std_logic
 	);
-end edgedtctr;
+end EDGEDTCTR;
 
-architecture behavioral of edgedtctr is
+architecture behavioral of EDGEDTCTR is
 	signal sreg : std_logic_vector(2 downto 0);
 begin
 	process (clk)

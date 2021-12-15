@@ -1,6 +1,8 @@
 package tipos_esp is
-     type natural_vector is array (0 to 98) of natural;
-     subtype BUTTON_T is natural range 1 to 4; -- 1: UP_BUTTON	2: DOWN_BUTTON	3: RIGHT_BUTTON	4: LEFT_BUTTON	  (El subtipo está hecho para ahorrar recursos en la síntesis)
+     subtype MESSAGE_T is natural range 0 to 5; -- Subtipo creado para ahorrar recursos, cada numero represente un mensaje a mostrar por los displays
+     subtype BUTTON_T is natural range 0 to 4; -- 1: UP_BUTTON	2: DOWN_BUTTON	3: RIGHT_BUTTON	4: LEFT_BUTTON	  (El subtipo está hecho para ahorrar recursos en la síntesis)
+     subtype LED_T is natural range 0 to 4; -- Subtipo para indicar los LEDS
+     type natural_vector is array (0 to 98) of BUTTON_T;
      type STATE_MASTER_T is (
             S0_STBY,-- S0_STBY: ESPERA INICIO DE JUEGO. Hasta que no se pulse OK_BUTTON no se pasa al estado S0.
             S0,		-- S0: START GAME. Se muestra una animación que indica el inicio del juego.

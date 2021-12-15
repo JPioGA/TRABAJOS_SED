@@ -3,16 +3,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-entity Button is
+entity BOTON is
 	port ( 
 			CLK100MHZ	: in     std_logic;
 			BTNC		: in     std_logic;
 			CPU_RESETN	: in     std_logic;
 			BUTTON_PUSHED:out	 std_logic
 		);
-end Button;
+end BOTON;
 
-architecture structural of Button is
+architecture structural of BOTON is
 
     component synchrnzr
         port (
@@ -38,4 +38,3 @@ flanqueador:    edgedtctr 	port map (CLK100MHZ, SYNC, EDGED);
 BUTTON_PUSHED <= EDGED;
 
 end architecture structural;
-

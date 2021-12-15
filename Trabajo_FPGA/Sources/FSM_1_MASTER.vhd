@@ -22,7 +22,7 @@ entity FSM_1_MASTER is
         RST_N       : in std_logic;
         OK_BUTTON   : in std_logic;
         ROUND       : out natural;
-        OUT_MESSAGE : out natural; -- 1: START ANIMATION; 2: GO INPUT ANIMATION; 3: INPUT OK ANIMATION; 4: GAME OVER ANIMATION
+        OUT_MESSAGE : out MESSAGE_T; -- 1: START ANIMATION; 2: GO INPUT ANIMATION; 3: INPUT OK ANIMATION; 4: GAME OVER ANIMATION
         
         -- MASTER-SLAVE WAIT interface
         START_WAITLED   : out std_logic;
@@ -45,7 +45,10 @@ entity FSM_1_MASTER is
         START_TIMER : out std_logic;
         PARAM_TIMER : out natural;
         RST_COUNT   : out std_logic;
-        DONE_TIMER  : in std_logic
+        DONE_TIMER  : in std_logic;
+        
+        -- MASTER-SLAVE LFSR interface
+        RAND_VALUE          : in LED_T
     );
 end FSM_1_MASTER;
 
@@ -55,23 +58,7 @@ architecture Behavioral of FSM_1_MASTER is
 	signal cur_state	 : STATE_MASTER_T;				-- Estado actual
 	signal nxt_state	 : STATE_MASTER_T;				-- Estado siguiente
 	signal game_sequence : natural_vector;	-- Vector que contendrá en sus elementos los valores aleatorios a adivinar por el jugador.
-	signal size          : natural := 0;
-	
-	-- Declaración de funciones
-		-- GENERACIÓN DE NÚMEROS ALEATORIOS (DEL 1 AL 4)
-	impure function rand_num(max : positive := COLORS) return natural is
-	  variable aux_result : real;
-	  variable result     : natural;
-	  variable seed1      : positive;
-	  variable seed2      : positive;
-	begin
-        seed1 := 1;
-        seed2 := 1;
-        uniform(seed1, seed2, aux_result); -- Genera un valor aleatorio entre 0 y 1
-		result := integer(floor(aux_result * 4.0)); -- Obtención de un valor entero entre 0 y 3
-	  return result + 1; -- Devuelvo un valor entre 1 y 4
-	end function rand_num;
-	
+	signal size          : natural := 0;	
 	
 begin
     -- Actualización de los estados
@@ -112,7 +99,7 @@ begin
 			when S1 =>
 				-- Adición de un nuevo elemento a la secuencia
 				size <= size + 1;
-				game_sequence(size-1) <= rand_num;
+				game_sequence(size-1) <= RAND_VALUE;
 				i := 0;
 				nxt_state <= S2;
 				
