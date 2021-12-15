@@ -46,7 +46,7 @@ begin
     begin
     
         leds <= "0000";
-        if(selector = 2) then
+        if(selector = 1) then
             case seq is
                 when 0 => leds(0) <= '1';
                 when 1 => leds(1) <= '1';

@@ -33,8 +33,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity visualizer is
   Port (
-    CLK100MHZ  :in std_logic;
-    CPU_RESETN : in std_logic;
+    CLK100MHZ  : in std_logic;
     round      : in natural;
     seq        : in natural;
     time       : in natural;
