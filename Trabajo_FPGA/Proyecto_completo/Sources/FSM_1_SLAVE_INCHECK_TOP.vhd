@@ -4,6 +4,11 @@ use IEEE.NUMERIC_STD.ALL;
 use work.tipos_esp.ALL;
 
 entity FSM_1_SLAVE_INCHECK_TOP is
+    generic(
+        MAX_ROUND   : natural := 99;
+        COLORS      : natural := 4;
+        TIME_WAIT   : natural := 200000000 -- ciclos de reloj de espera
+    );
     port (
         CLK                     : in STD_LOGIC;
         RST_N                   : in STD_LOGIC;
@@ -12,19 +17,20 @@ entity FSM_1_SLAVE_INCHECK_TOP is
         RIGHT_BUTTON            : in std_logic;
         LEFT_BUTTON             : in std_logic;
         BUTTON_PUSHED           : out BUTTON_T;
-        LED_VALUE               : out LED_T; --LED a encender
-        STATE_INCHECK           : out STATE_INCHECK_T;
+        --LED_VALUE               : out LED_T; --LED a encender
+        LIGHT                   : out std_logic_vector(COLORS-1 downto 0);
+        --STATE_INCHECK           : out STATE_INCHECK_T;
 
         
         -- MASTER-SLAVE INCHECK interfece
         START_INCHECK           : in std_logic;
         PARAM_INCHECK_size      : in natural; -- SIZE. Tamaño de la secuencia actual
         PARAM_INCHECK_seq       : in natural_vector; -- SEQ. Secuencia actual
-        DONE_INCHECK            : out natural -- 0: none; 1: NO OK; 2: name
+        DONE_INCHECK            : out LED_T -- 0: none; 1: NO OK; 2: name
     );
 end FSM_1_SLAVE_INCHECK_TOP;
 
-architecture Behavioral of FSM_1_SLAVE_INCHECK_TOP is
+architecture structural of FSM_1_SLAVE_INCHECK_TOP is
     component FSM_1_SLAVE_INCHECK
         port(
             CLK                     : in STD_LOGIC;
@@ -34,14 +40,15 @@ architecture Behavioral of FSM_1_SLAVE_INCHECK_TOP is
             RIGHT_BUTTON            : in std_logic;
             LEFT_BUTTON             : in std_logic;
             BUTTON_PUSHED_INCHECK   : out BUTTON_T;
-            LED_VALUE               : out LED_T; --LED a encender
-            STATE_INCHECK           : out STATE_INCHECK_T;
+            --LED_VALUE               : out LED_T; --LED a encender
+            LIGHT                   : out std_logic_vector(COLORS-1 downto 0);
+            --STATE_INCHECK           : out STATE_INCHECK_T;
             
             -- MASTER-SLAVE INCHECK interfece
             START_INCHECK           : in std_logic;
-            PARAM_INCHECK_size      : in natural; -- SIZE. Tamaño de la secuencia actual
+            PARAM_INCHECK_size      : in ROUND_T; -- SIZE. Tamaño de la secuencia actual
             PARAM_INCHECK_seq       : in natural_vector; -- SEQ. Secuencia actual
-            DONE_INCHECK            : out natural; -- 0: none; 1: NO OK; 2: name
+            DONE_INCHECK            : out LED_T; -- 0: none; 1: NO OK; 2: name
             
             -- SLAVE SHOWSEQ-SLAVE WAITLED interface
             START_WAITLED   : out std_logic;
@@ -72,8 +79,9 @@ begin
         RIGHT_BUTTON            => RIGHT_BUTTON,
         LEFT_BUTTON             => LEFT_BUTTON,
         BUTTON_PUSHED_INCHECK   => BUTTON_PUSHED,
-        LED_VALUE               => LED_VALUE,
-        STATE_INCHECK           => STATE_INCHECK,
+        --LED_VALUE               => LED_VALUE,
+        LIGHT                   => LIGHT,
+        --STATE_INCHECK           => STATE_INCHECK,
         -- MASTER-SLAVE INCHECK interfece
         START_INCHECK           => START_INCHECK,
         PARAM_INCHECK_size      => PARAM_INCHECK_size,
@@ -92,4 +100,4 @@ begin
         PARAM_WAITLED   => param_wait,
         DONE_WAITLED    => done_wait
     );
-end Behavioral;
+end structural;

@@ -48,7 +48,10 @@ entity FSM_1_MASTER is
         DONE_TIMER  : in std_logic;
         
         -- MASTER-SLAVE LFSR interface
-        RAND_VALUE          : in LED_T
+        RAND_VALUE          : in LED_T;
+        
+        -- SLAVES SHOWSEQ INCHECK - MUX LEDS interface
+        SELECTOR     : out std_logic
     );
 end FSM_1_MASTER;
 
@@ -169,7 +172,7 @@ begin
         START_TIMER             <= '0';
         PARAM_TIMER             <= 0;
         RST_COUNT               <= '0';
-		
+		SELECTOR                <= 'Z';
 		case cur_state is
 			when S0_STBY =>
 				-- General MASTER interface
@@ -190,6 +193,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+				SELECTOR                <= 'Z';
 				
 			when S0 =>
 				-- General MASTER interface
@@ -210,7 +214,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
-			
+			    SELECTOR                <= 'Z';
 			when S0_WT =>
 				-- General MASTER interface
                 ROUND                   <= 0;
@@ -230,6 +234,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
                 
 			when S1 =>
 				-- General MASTER interface
@@ -250,6 +255,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
 				
 			when S2 =>
 				-- General MASTER interface
@@ -270,6 +276,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
 			
 			when S2_WT =>
 			    -- General MASTER interface
@@ -280,8 +287,8 @@ begin
                 PARAM_WAITLED           <= 0;
                 -- MASTER-SLAVE SHOWSEQ interface
                 START_SHOWSEQ           <= '0';
-                PARAM_SHOWSEQ_seq       <= (others => 0);
-                PARAM_SHOWSEQ_size      <= 0;
+                PARAM_SHOWSEQ_seq       <= game_sequence;
+                PARAM_SHOWSEQ_size      <= size;
                 -- MASTER-SLAVE INCHECK interface
                 START_INCHECK           <= '0';
                 PARAM_INCHECK_size      <= 0;
@@ -290,6 +297,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= '0';
 
 			when S3 =>
 				-- General MASTER interface
@@ -310,6 +318,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
             
             when S3_WT =>
                 -- General MASTER interface
@@ -330,6 +339,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
             	
 			when S4 =>
 				-- General MASTER interface
@@ -350,6 +360,7 @@ begin
                 START_TIMER             <= '1';
                 PARAM_TIMER             <= size; --Según numero de rondas, varía el tiempo
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
 			
 			when S4_WT =>
                 -- General MASTER interface
@@ -369,7 +380,8 @@ begin
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= size;
-                RST_COUNT               <= '0';			
+                RST_COUNT               <= '0';
+                SELECTOR                <= '1';		
 			
 			when S5 =>
 				-- General MASTER interface
@@ -390,6 +402,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '1';
+                SELECTOR                <= 'Z';
 			
 			when S5_WT =>
 				-- General MASTER interface
@@ -410,6 +423,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
 			
 			when S6 =>
 				-- General MASTER interface
@@ -430,6 +444,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '1';
+                SELECTOR                <= 'Z';
 			
 			when S6_WT =>	
 			    -- General MASTER interface
@@ -450,6 +465,8 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
+                
 			when others =>
 				-- General MASTER interface
                 ROUND                   <= 0;
@@ -469,6 +486,7 @@ begin
                 START_TIMER             <= '0';
                 PARAM_TIMER             <= 0;
                 RST_COUNT               <= '0';
+                SELECTOR                <= 'Z';
 		end case;
 	end process output_decoder;
 

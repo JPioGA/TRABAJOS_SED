@@ -7,7 +7,6 @@ entity BOTON is
 	port ( 
 			CLK100MHZ	: in     std_logic;
 			BTNC		: in     std_logic;
-			CPU_RESETN	: in     std_logic;
 			BUTTON_PUSHED:out	 std_logic
 		);
 end BOTON;
