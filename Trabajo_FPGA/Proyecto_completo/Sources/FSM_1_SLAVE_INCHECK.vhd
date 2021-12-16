@@ -17,14 +17,15 @@ entity FSM_1_SLAVE_INCHECK is
         RIGHT_BUTTON            : in std_logic;
         LEFT_BUTTON             : in std_logic;
         BUTTON_PUSHED_INCHECK   : out BUTTON_T; --A�adido para control de botones (tb)
-        LED_VALUE               : out LED_T; --LED a encender
-        STATE_INCHECK           : out STATE_INCHECK_T; -- Estado actual de la máquina
+        --LED_VALUE               : out LED_T; --LED a encender
+        LIGHT                   : out std_logic_vector(COLORS-1 downto 0);
+        --STATE_INCHECK           : out STATE_INCHECK_T; -- Estado actual de la máquina
         
         -- MASTER-SLAVE INCHECK interfece
         START_INCHECK           : in std_logic;
-        PARAM_INCHECK_size      : in natural; -- SIZE. Tamaño de la secuencia actual
+        PARAM_INCHECK_size      : in ROUND_T; -- SIZE. Tamaño de la secuencia actual
         PARAM_INCHECK_seq       : in natural_vector; -- SEQ. Secuencia actual
-        DONE_INCHECK            : out natural; -- 0: none; 1: NO OK; 2: name
+        DONE_INCHECK            : out LED_T; -- 0: none; 1: NO OK; 2: name
         
         -- SLAVE SHOWSEQ-SLAVE WAITLED interface
         START_WAITLED   : out std_logic;
@@ -121,85 +122,100 @@ begin
                 nxt_state <= S3_STBY; -- En caso de erro, mandar a reposo la máquina de estado
         end case;
         BUTTON_PUSHED_INCHECK<=button_pushed;
-        STATE_INCHECK<=cur_state;
+        --STATE_INCHECK<=cur_state;
         
     end process nxt_state_decoder;
     
     
     output_decoder: process(cur_state)
     begin
-        LED_VALUE     <= 0;
+        --LED_VALUE     <= 0;
+        LIGHT <= (others => '0');
         DONE_INCHECK  <= 0;
         START_WAITLED <= '0';
         PARAM_WAITLED <= 0;
         case cur_state is
             when S3_STBY =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
             when S3_0 =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
             when S3_1 =>
-                LED_VALUE     <= 1;
+                --LED_VALUE     <= 1;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_1WT =>
-                LED_VALUE     <= 1;
+                --LED_VALUE     <= 1;
+                LIGHT(0) <= '1';
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_2 =>
-                LED_VALUE     <= 2;
+                --LED_VALUE     <= 2;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_2WT =>
-                LED_VALUE     <= 2;
+                --LED_VALUE     <= 2;
+                LIGHT(1) <= '1';
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_3 =>
-                LED_VALUE     <= 3;
+                --LED_VALUE     <= 3;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_3WT =>
-                LED_VALUE     <= 3;
+                --LED_VALUE     <= 3;
+                LIGHT(2) <= '1';
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_4 =>
-                LED_VALUE     <= 4;
+                --LED_VALUE     <= 4;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_4WT =>
-                LED_VALUE     <= 4;
+                --LED_VALUE     <= 4;
+                LIGHT(3) <= '1';
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
             when S3_5 =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
             when S3_6 =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 1; -- Se ha cometido un error.
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
             when S3_7 =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 2; -- Comprobación completa OK
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
             when others =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_INCHECK  <= 0;
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;

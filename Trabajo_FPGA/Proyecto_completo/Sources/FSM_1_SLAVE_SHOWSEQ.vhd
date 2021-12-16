@@ -18,13 +18,14 @@ entity FSM_1_SLAVE_SHOWSEQ is
     port (
         CLK                     : in STD_LOGIC;
         RST_N                   : in STD_LOGIC;
-        LED_VALUE               : out LED_T; --LED a bit
-        STATE                   : out STATE_SHOWSEQ_T; -- Estado actual de la m醧uina
+        --LED_VALUE               : out LED_T; --LED a bit
+        LIGHT                   : out std_logic_vector(COLORS-1 downto 0);
+        --STATE                   : out STATE_SHOWSEQ_T; -- Estado actual de la m醧uina
         
         -- MASTER-SLAVE SHOWSEQ interface
         START_SHOWSEQ           : in std_logic;
         PARAM_SHOWSEQ_sequence  : in natural_vector;
-        PARAM_SHOWSEQ_size      : in natural;
+        PARAM_SHOWSEQ_size      : in ROUND_T;
         DONE_SHOWSEQ            : out std_logic;
 
         -- SLAVE SHOWSEQ-SLAVE WAITLED interface
@@ -49,7 +50,7 @@ begin
 	end process state_register;
     
     nxt_state_decoder: process(cur_state, DONE_WAITLED, START_SHOWSEQ)
-        variable button_pushed : natural := 0; -- Variable auxiliar de comprobaci贸n de bot贸n pulsado
+        variable button_pushed : BUTTON_T := 0; -- Variable auxiliar de comprobaci贸n de bot贸n pulsado
         variable i : natural := 0;    -- Elemento iterador
     begin
         nxt_state <= cur_state;
@@ -109,90 +110,104 @@ begin
     
     output_decoder: process(cur_state)
     begin
-        LED_VALUE     <= 0;
+        --LED_VALUE     <= 0;
+        LIGHT <= (others => '0');
         DONE_SHOWSEQ  <= '0';
         START_WAITLED <= '0';
         PARAM_WAITLED <= 0;
-        STATE <= S2_STBY;
+        --STATE <= S2_STBY;
         case cur_state is
             when S2_STBY =>
-                LED_VALUE    <= 0;
+                --LED_VALUE    <= 0;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
-                STATE         <= S2_STBY;
+                --STATE         <= S2_STBY;
             when S2_0 =>
-                LED_VALUE    <= 0;
+                --LED_VALUE    <= 0;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
-                STATE         <= S2_0;
+                --STATE         <= S2_0;
             when S2_1 =>
-                LED_VALUE     <= 1;
+                --LED_VALUE     <= 1;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_1;
+                --STATE         <= S2_1;
             when S2_1WT =>
-                LED_VALUE     <= 1;
+                --LED_VALUE     <= 1;
+                LIGHT(0) <= '1';
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_1WT;
+                --STATE         <= S2_1WT;
             when S2_2 =>
-                LED_VALUE     <= 2;
+                --LED_VALUE     <= 2;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_2;
+                --STATE         <= S2_2;
             when S2_2WT =>
-                LED_VALUE     <= 2;
+                --LED_VALUE     <= 2;
+                LIGHT(1) <= '1';
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_2WT;
+                --STATE         <= S2_2WT;
             when S2_3 =>
-                LED_VALUE     <= 3;
+                --LED_VALUE     <= 3;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_3;
+                --STATE         <= S2_3;
             when S2_3WT =>
-                LED_VALUE     <= 3;
+                --LED_VALUE     <= 3;
+                LIGHT(2) <= '1';
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_3WT;
+                --STATE         <= S2_3WT;
             when S2_4 =>
-                LED_VALUE     <= 4;
+                --LED_VALUE     <= 4;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '1';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_4;
+                --STATE         <= S2_4;
             when S2_4WT =>
-                LED_VALUE     <= 4;
+                --LED_VALUE     <= 4;
+                LIGHT(3) <= '1';
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= TIME_WAIT;
-                STATE         <= S2_4WT;
+                --STATE         <= S2_4WT;
             when S2_5 =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
-                STATE         <= S2_5;
+                --STATE         <= S2_5;
             when S2_6 =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ  <= '1';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
-                STATE         <= S2_6;
+                --STATE         <= S2_6;
             when others =>
-                LED_VALUE     <= 0;
+                --LED_VALUE     <= 0;
+                LIGHT <= (others => '0');
                 DONE_SHOWSEQ  <= '0';
                 START_WAITLED <= '0';
                 PARAM_WAITLED <= 0;
-                STATE         <= S2_STBY;
+                --STATE         <= S2_STBY;
         end case;
     end process output_decoder;
 end Behavioral;

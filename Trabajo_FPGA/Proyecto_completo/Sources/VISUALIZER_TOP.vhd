@@ -5,8 +5,8 @@ use work.tipos_esp.ALL;
 entity VISUALIZER_TOP is
   Port (
     CLK  : in std_logic;
-    round      : in natural;
-    seq        : in natural;
+    round      : in ROUND_T;
+    seq        : in LED_T;
     tim        : in natural;
     selector   : in MESSAGE_T;
     segments   : out std_logic_vector(6 downto 0);
@@ -19,7 +19,7 @@ architecture Behavioral of VISUALIZER_TOP is
 
 component NATURAL_DECODER
     port (
-        value : in natural range 0 to 99;
+        value : in natural;
         segments_smaller : out std_logic_vector(6 downto 0);
         segments_larger : out std_logic_vector(6 downto 0)
   );
@@ -28,13 +28,13 @@ end component;
 component LED_DECODER
     port(
         selector : in  natural;
-        seq      : in  natural;
+        seq      : in  LED_T;
         leds     : out std_logic_vector(3 downto 0));
 end component;
 
 component DISPLAY_CONTROLLER
     port(
-        selector           : in  natural;
+        selector           : in  MESSAGE_T;
         time_7seg_smaller  : in  std_logic_vector(6 downto 0);
         time_7seg_larger   : in  std_logic_vector(6 downto 0);
         round_7seg_smaller : in  std_logic_vector(6 downto 0);

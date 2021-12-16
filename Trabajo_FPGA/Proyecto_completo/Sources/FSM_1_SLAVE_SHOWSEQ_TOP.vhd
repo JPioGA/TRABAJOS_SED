@@ -10,16 +10,22 @@ use IEEE.NUMERIC_STD.ALL;
 use work.tipos_esp.ALL;
 
 entity FSM_1_SLAVE_SHOWSEQ_TOP is
+    generic(
+        MAX_ROUND   : natural := 99;
+        COLORS      : natural := 4;
+        TIME_WAIT   : natural := 200000000 -- ciclos de reloj de espera
+    );
     port (
         CLK                     : in STD_LOGIC;
         RST_N                   : in STD_LOGIC;
-        LED_VALUE               : out LED_T; --LED a bit
-        STATE_TOP               : out STATE_SHOWSEQ_T;
+        --LED_VALUE               : out LED_T; --LED a bit
+        LIGHT                   : out std_logic_vector(COLORS-1 downto 0);
+        --STATE_TOP               : out STATE_SHOWSEQ_T;
         
         -- MASTER-SLAVE SHOWSEQ interface
         START_SHOWSEQ           : in std_logic;
         PARAM_SHOWSEQ_seq       : in natural_vector;
-        PARAM_SHOWSEQ_size      : in natural;
+        PARAM_SHOWSEQ_size      : in ROUND_T;
         DONE_SHOWSEQ            : out std_logic
     );
 end FSM_1_SLAVE_SHOWSEQ_TOP;
@@ -29,12 +35,13 @@ architecture structural of FSM_1_SLAVE_SHOWSEQ_TOP is
         port(
             CLK                     : in STD_LOGIC;
             RST_N                   : in STD_LOGIC;
-            LED_VALUE               : out LED_T; --LED a bit 
-            STATE                   : out STATE_SHOWSEQ_T;    
+            --LED_VALUE               : out LED_T; --LED a bit
+            LIGHT                   : out std_logic_vector(COLORS-1 downto 0);
+            --STATE                   : out STATE_SHOWSEQ_T;    
             -- MASTER-SLAVE SHOWSEQ interface
             START_SHOWSEQ           : in std_logic;
             PARAM_SHOWSEQ_sequence  : in natural_vector;
-            PARAM_SHOWSEQ_size      : in natural;
+            PARAM_SHOWSEQ_size      : in ROUND_T;
             DONE_SHOWSEQ            : out std_logic;
             -- SLAVE SHOWSEQ-SLAVE WAITLED interface
             START_WAITLED   : out std_logic;
@@ -62,8 +69,9 @@ begin
     instance_showseq: FSM_1_SLAVE_SHOWSEQ port map(
         CLK                     => CLK,
         RST_N                   => RST_N,
-        LED_VALUE               => LED_VALUE,
-        STATE                   => STATE_TOP,
+        --LED_VALUE               => LED_VALUE,
+        LIGHT                   => LIGHT,
+        --STATE                   => STATE_TOP,
         START_SHOWSEQ           => START_SHOWSEQ,
         PARAM_SHOWSEQ_sequence  => PARAM_SHOWSEQ_seq,
         PARAM_SHOWSEQ_size      => PARAM_SHOWSEQ_size,
