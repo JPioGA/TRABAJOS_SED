@@ -51,24 +51,24 @@ entity FSM_1_MASTER is
         RAND_VALUE          : in LED_T;
         
         -- SLAVES SHOWSEQ INCHECK - MUX LEDS interface
-        SELECTOR     : out std_logic;
+        SELECTOR     : out std_logic
             );
         
 end FSM_1_MASTER;
 
 
 architecture Behavioral of FSM_1_MASTER is
-    -- DeclaraciÛn de seÒales utilizadas	
+    -- Declaraci√≥n de se√±ales utilizadas	
 	signal cur_state	 : STATE_MASTER_T;				-- Estado actual
 	signal nxt_state	 : STATE_MASTER_T;				-- Estado siguiente
-	signal game_sequence : natural_vector;	-- Vector que contendr· en sus elementos los valores aleatorios a adivinar por el jugador.
+	signal game_sequence : natural_vector;	-- Vector que contendr√° en sus elementos los valores aleatorios a adivinar por el jugador.
 	signal size          : natural := 0;	
 	
 begin
-    -- ActualizaciÛn de los estados
+    -- Actualizaci√≥n de los estados
 	state_register: process(CLK, RST_N)
 	begin
-		if RST_N = '0' then -- Si entra un reset, mandar a reposo la m·quina de estados
+		if RST_N = '0' then -- Si entra un reset, mandar a reposo la m√°quina de estados
 			cur_state <= S0_WT;
 		elsif rising_edge(CLK) then
 			cur_state <= nxt_state;
@@ -76,7 +76,7 @@ begin
 	end process;
 	
 	
-	-- Control de transiciÛn entre estados
+	-- Control de transici√≥n entre estados
 	nxt_state_decoder: process(cur_state, OK_BUTTON, DONE_SHOWSEQ, DONE_INCHECK, DONE_TIMER, DONE_WAITLED) -- Proceso COMBINACIONAL: Solo introducir las entradas.
 	   variable i : natural := 0;
 	begin
@@ -101,7 +101,7 @@ begin
 			     end if;
 			     
 			when S1 =>
-				-- AdiciÛn de un nuevo elemento a la secuencia
+				-- Adici√≥n de un nuevo elemento a la secuencia
 				size <= size + 1;
 				game_sequence(size) <= RAND_VALUE;
 				i := 0;
@@ -115,7 +115,7 @@ begin
 				end if;
 				
 			when S3 =>
-				nxt_state <= S3_WT; -- ActivaciÛn de animaciÛn GO ANIMATION	
+				nxt_state <= S3_WT; -- Activaci√≥n de animaci√≥n GO ANIMATION	
 			when S3_WT =>
 			    if DONE_WAITLED = '1' then
 			         nxt_state <= S4;
@@ -123,7 +123,7 @@ begin
 				
 					
 			when S4 =>
-				nxt_state <= S4_WT; -- ActivaciÛn de las SLAVES INCHECK y TIMER
+				nxt_state <= S4_WT; -- Activaci√≥n de las SLAVES INCHECK y TIMER
 			when S4_WT => 
 			     if (DONE_INCHECK = 1) OR (DONE_TIMER = '1') then
 				   nxt_state <= S6; -- GAME OVER
@@ -132,7 +132,7 @@ begin
 				end if;
 				
 			when S5 =>
-				nxt_state <= S5_WT; -- ActivaciÛn de animaciÛn OK INPUT SEQUENCE
+				nxt_state <= S5_WT; -- Activaci√≥n de animaci√≥n OK INPUT SEQUENCE
 			when S5_WT =>
 			     if DONE_WAITLED = '1' then
 			         nxt_state <= S1;
@@ -148,9 +148,7 @@ begin
 			when others =>
 				nxt_state <= S0_STBY; -- En caso de fallo, volver al estado de espera.	
 		end case;	
-		STATE<=cur_state;
-		GAME_SEQ<=game_sequence;
-		GAME_SIZE<=size;
+		
 	end process;
 	
 	
@@ -362,7 +360,7 @@ begin
                 PARAM_INCHECK_seq       <= game_sequence;
                 -- MASTER-SLAVE TIMER interface
                 START_TIMER             <= '1';
-                PARAM_TIMER             <= size; --Seg˙n numero de rondas, varÌa el tiempo
+                PARAM_TIMER             <= size; --Seg√∫n numero de rondas, var√≠a el tiempo
                 RST_COUNT               <= '0';
                 SELECTOR                <= 'Z';
 			
