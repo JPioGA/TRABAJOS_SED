@@ -18,16 +18,13 @@ package tipos_especiales is
     );
     
     type STATE_SLAVE_T is (
-        S_STBY, -- S_STBY: ESPERA INICIO DE JUEGO. Hasta que no se pulse OK_BUTTON no se pasa al estado S0.
-        S0,		-- S0: Estado de generación de la secuencia a adivinar por el jugador
-        S1,		-- S1: ADD VALUE. Adición de un nuevo valor a la secuencia
-        S1_WT,  -- S1_WT: Tiempo de espera de muestra del mensaje GO
-        S2,		-- S2: Disparo de INCHECK. Máquina esclava encargada del juego
-        S2_WT,  -- S2_WT: Estado de espera al final de la interacción con el jugador
-        S3,     -- S3: WIN. Disparo de TIMER para mostrar el mensaje al ganar el 
-        S3_WT,  -- S3_WT: Tiempo de espera de muestra del mensaje WIN
-        S4,		-- S3: GAME OVER. Disparo de TIMER para mostrar el mensaje al perder el juego.
-        S4_WT   -- S4_WT: Tiempo de espera de muestra del mensaje GAME OVER
+        S_STBY, -- S_STBY: ESPERA INICIO DE JUEGO.
+        S1,		-- S1: Espera a un input del jugador
+        S2,		-- S2: Comprobación del input
+        S3,		-- S3: Input OK. Comprobación si se ha terminado la secuencia
+        S4     -- S4: WIN. Todos los inputs se introdujeron correctamente
+        --S5,		-- S5: Input NO OK. Comprobación si se han termiando los TRYS
+        --S6		-- S6: GAME OVER. Se acabaron los intentos
     );
     
     -- DECLARACIÓN DE COMPONENTES UTILIZADOS (para ahorrar espacio y limpieza del código)

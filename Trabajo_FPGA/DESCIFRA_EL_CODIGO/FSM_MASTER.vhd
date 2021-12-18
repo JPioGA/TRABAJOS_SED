@@ -146,7 +146,7 @@ begin
                 START_TIMER <= '1'; 
                 
 			when S4_WT => 
-                OUT_MESSAGE <= "010"; -- GAME OVER MESSAGE
+                OUT_MESSAGE <= "100"; -- GAME OVER MESSAGE
 				
 			when others =>
                 START_TIMER     <= '0';
