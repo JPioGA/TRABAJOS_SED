@@ -12,8 +12,8 @@ entity FSM_SLAVE_INCHECK is
             BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
             --LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER según se vayan encendiendo los LEDS.
             DONE_INCHECK    : out std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
-            INTENTOS        : out natural range 0 to 10;
-            STATE : out STATE_SLAVE_T           
+            INTENTOS        : out natural range 0 to 10
+                    
             );
 end FSM_SLAVE_INCHECK;
 
@@ -106,6 +106,5 @@ begin
                 nxt_state <= S_STBY; -- En caso de fallo, volver al estado de espera.	
 		end case;
 		
-		STATE <= cur_state;
 	end process;
 end Behavioral;
