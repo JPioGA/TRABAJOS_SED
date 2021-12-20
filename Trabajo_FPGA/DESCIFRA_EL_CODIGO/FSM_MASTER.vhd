@@ -12,6 +12,7 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use work.tipos_especiales.ALL;
 
 entity FSM_MASTER is
+    generic( TEST_SEQ : SEQUENCE_T := ("0001", "0010", "0100", "1000")); -- Secuencia de prueba (Para no usar FSM) (UP-DOWN-LEFT-RIGHT)
     port (  CLK : in std_logic;
             RST_N : in std_logic;
             OK_BUTTON   : in std_logic;
@@ -63,10 +64,13 @@ begin
 				end if;
 				
 			when S0 =>
-			    if DONE_LFSR = '1' then -- Llegada de una nueva secuencia
-                    game_sequence <= RAND_SEQ; -- Cargo la nueva secuencia a adivinar en la señal auxiliar
-                    nxt_state <= S1; -- Tras recibir la nueva secuencia, paso al siguiente estado
-				end if;
+--			    if DONE_LFSR = '1' then -- Llegada de una nueva secuencia
+--                    game_sequence <= RAND_SEQ; -- Cargo la nueva secuencia a adivinar en la señal auxiliar
+--                    nxt_state <= S1; -- Tras recibir la nueva secuencia, paso al siguiente estado
+--				end if;
+                -- Sin el LFSR. 
+				game_sequence <= TEST_SEQ;
+				nxt_state <= S1;
 				
 			when S1 =>
                 nxt_state <= S1_WT; -- Disparo el timer y paso a esperar
@@ -135,6 +139,7 @@ begin
                 
 			when S2_WT =>
 				PARAM_SEQ <= game_sequence; -- Mantenimiento de la secuencia durante el juego
+				OUT_MESSAGE <= "101"; -- Imprimir intentos
 				
 			when S3 =>
                 START_TIMER <= '1';

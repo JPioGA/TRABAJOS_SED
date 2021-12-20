@@ -59,8 +59,9 @@ package tipos_especiales is
                 START_INCHECK   : in std_logic;  -- Señal de inicio de la comparación
                 PARAM_SEQ       : in SEQUENCE_T; -- Secuencia aleatoria a adivinar por el jugador
                 BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
-                LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER según se vayan encendiendo los LEDS.
-                DONE_INCHECK    : out std_logic_vector(1 downto 0)); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
+                --LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER según se vayan encendiendo los LEDS.
+                DONE_INCHECK    : out std_logic_vector(1 downto 0);
+                INTENTOS        : out natural range 0 to 10); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
     end component;
     
     

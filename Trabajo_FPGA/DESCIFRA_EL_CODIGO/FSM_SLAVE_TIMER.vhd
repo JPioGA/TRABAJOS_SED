@@ -7,10 +7,11 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
+
 
 entity FSM_SLAVE_TIMER is
     generic( DELAY : natural := 200000000); -- Pulsos de reloj a esperar (100 MHz)
+             --WIDTH : natural := 28);-- NUMERO DE BITS DEL CONTADOR
     
     port (  CLK         : in std_logic;
             RST_N       : in std_logic;
@@ -21,6 +22,7 @@ end FSM_SLAVE_TIMER;
 
 architecture Behavioral of FSM_SLAVE_TIMER is
     signal count : natural;
+    --signal count_aux : unsigned(DELAY - 1 downto 0);
 begin
   DONE_TIMER <= '1' when count = 0 else '0';
 

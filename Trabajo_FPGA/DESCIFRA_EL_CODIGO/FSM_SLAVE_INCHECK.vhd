@@ -19,7 +19,7 @@ entity FSM_SLAVE_INCHECK is
             BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
             --LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER según se vayan encendiendo los LEDS.
             DONE_INCHECK    : out std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
-            INTENTOS        : out natural range 0 to 10
+            INTENTOS        : out natural range 0 to 9
             );
 end FSM_SLAVE_INCHECK;
 
@@ -48,11 +48,11 @@ begin
 	end process;
 	
 	-- TRANSICIONES DE ESTADO
-    nxt_state_decoder: process(CLK, cur_state)
+    nxt_state_decoder: process(cur_state)
         variable tmp_sequence :  SEQUENCE_T;
         variable tmp_button_pushed    : std_logic_vector (3 downto 0) := "0000"; -- Botón pulsado por el jugador
         variable size : natural := 4;
-        variable try  : natural := 10; -- Intentos del jugador
+        variable try  : natural := 9; -- Intentos del jugador
     begin
         -- Asegurar que el proceso sea combinacional
 		nxt_state <= cur_state;
@@ -63,13 +63,14 @@ begin
 				if START_INCHECK = '1' then -- Inicio del juego
 				    tmp_sequence := PARAM_SEQ;
 				    size := 4;
+				    try := 9;
 					nxt_state <= S1;
 				end if;
 
 	
 			when S1 =>
                 tmp_button_pushed := BTN; --Guardamos continuamente el valor de entrada de los botones
-                INTENTOS <= try;
+                INTENTOS <= try; -- Mostrar por los displays los intentos
 			    if tmp_button_pushed /= "0000" then
                     nxt_state <= S2; -- Disparo el timer y paso a esperar
 			    end if;
@@ -83,10 +84,10 @@ begin
                         nxt_state <= S3; -- WIN
                     end if;
                 elsif tmp_button_pushed /= tmp_sequence(size-1) then -- NO OK INPUT
-                    if try /= 1 then
+                    if try >= 1 then
                         try := try - 1;
                         nxt_state <= S1; -- Vuelta a esperar un input
-                    elsif try = 1 then -- Si TRY era 1, significa que esta ronda era su ultimo intento.
+                    elsif try < 1 then -- Si TRY era 1, significa que esta ronda era su ultimo intento.
                         nxt_state <= S4; -- GAME OVER
                     end if;
                 end if;

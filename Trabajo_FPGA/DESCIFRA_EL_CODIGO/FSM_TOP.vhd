@@ -14,7 +14,8 @@ entity FSM_TOP is
     port (  CLK : in std_logic;
             RST_N : in std_logic;
             BUTTON   : in std_logic_vector(4 downto 0); -- ( 0 OK - 1 UP -  2 DOWN - 3 LEFT -  4 RIGHT)
-            LED      : out std_logic_vector(3 downto 0); -- 
+            --LED      : out std_logic_vector(3 downto 0); -- 
+            ATTEMPS : out natural range 0 to 10;
             OUT_MESSAGE : out std_logic_vector(2 downto 0)); -- "000" si nada // "001" si START // "010" si GO // "011" si GAME OVER // "100" si WIN
 end FSM_TOP;
 
@@ -24,6 +25,7 @@ architecture Behavioral of FSM_TOP is
     signal incheck_start : std_logic;
     signal incheck_param : SEQUENCE_T;
     signal incheck_done : std_logic_vector(1 downto 0);
+    signal incheck_trys : natural range 0 to 10;
         -- Interfez entre MASTER y TIMER
     signal timer_start : std_logic;
     signal timer_done  : std_logic;
@@ -67,7 +69,7 @@ begin
                     START_INCHECK => incheck_start,
                     PARAM_SEQ     => incheck_param,
                     BTN           => BUTTON(4 downto 1), -- Todos los botones menos el OK_BUTTON
-                    LED           => LED,
-                    DONE_INCHECK  => incheck_done
-                    );
+                    --LED           => LED,
+                    DONE_INCHECK  => incheck_done,
+                    INTENTOS => ATTEMPS);
 end Behavioral;
