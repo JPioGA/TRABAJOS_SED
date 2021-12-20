@@ -1,10 +1,3 @@
------------------------------------------------------------------------------------
--- FSM_SLAVE_INCHECK
--- Compente esclavo de FSM_MASTER encargado de comprobar los inputs del jugador con
--- la secuencia creada.
------------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -14,48 +7,50 @@ use work.tipos_especiales.ALL;
 entity FSM_SLAVE_INCHECK is
     port (  CLK             : in std_logic;
             RST_N           : in std_logic;
-            START_INCHECK   : in std_logic;  -- Se馻l de inicio de la comparaci髇
+            START_INCHECK   : in std_logic;  -- Se帽al de inicio de la comparaci贸n
             PARAM_SEQ       : in SEQUENCE_T; -- Secuencia aleatoria a adivinar por el jugador
             BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
-            --LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER seg鷑 se vayan encendiendo los LEDS.
+            --LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER seg煤n se vayan encendiendo los LEDS.
             DONE_INCHECK    : out std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
-            INTENTOS        : out natural range 0 to 9
+            INTENTOS        : out natural range 0 to 10;
+            STATE : out STATE_SLAVE_T           
             );
 end FSM_SLAVE_INCHECK;
 
 architecture Behavioral of FSM_SLAVE_INCHECK is
 
-    -- Se馻les utilizadas
+    -- Se帽ales utilizadas
     signal cur_state	 : STATE_SLAVE_T;				-- Estado actual
 	signal nxt_state	 : STATE_SLAVE_T;				-- Estado siguiente
 	
-    signal tmp_button           : std_logic; -- Se馻l que indica el inicio de la comparaci髇
-    --signal tmp_button_pushed    : std_logic_vector (3 downto 0); -- Bot髇 pulsado por el jugador
+    --signal tmp_button           : std_logic; -- Se帽al que indica el inicio de la comparaci贸n
+    --signal tmp_button_pushed    : std_logic_vector (3 downto 0) := "0000";  -- Bot贸n pulsado por el jugador
     --signal tmp_sequence :  SEQUENCE_T;
-    --signal tmp_elem_to_compare   : std_logic_vector (3 downto 0); -- Elemento de la secuencia a comparar con el bot髇 del juagador
-    --signal tmp_result_comp      : std_logic; -- Se馻l que indica el resultado de la comparaci髇 entre el bot髇 pulsado y secuencia 
+    --signal tmp_elem_to_compare   : std_logic_vector (3 downto 0); -- Elemento de la secuencia a comparar con el bot贸n del juagador
+    --signal tmp_result_comp      : std_logic; -- Se帽al que indica el resultado de la comparaci贸n entre el bot贸n pulsado y secuencia 
 begin
 
 
-    -- Actualizaci髇 de los estados
+    -- Actualizaci贸n de los estados
 	state_register: process(CLK, RST_N)
 	begin
-		if RST_N = '0' then -- Si entra un reset, mandar a reposo la m醧uina de estados
+		if RST_N = '0' then -- Si entra un reset, mandar a reposo la m谩quina de estados
 			cur_state <= S_STBY;
-		elsif rising_edge(CLK) then
+		elsif rising_edge(CLK) or falling_edge(CLK) then
 			cur_state <= nxt_state;
 		end if;
 	end process;
 	
 	-- TRANSICIONES DE ESTADO
-    nxt_state_decoder: process(cur_state)
+    nxt_state_decoder: process(cur_state, START_INCHECK, BTN)
         variable tmp_sequence :  SEQUENCE_T;
-        variable tmp_button_pushed    : std_logic_vector (3 downto 0) := "0000"; -- Bot髇 pulsado por el jugador
+        --variable tmp_button_pushed    : std_logic_vector (3 downto 0) := "0000"; -- Bot贸n pulsado por el jugador
         variable size : natural := 4;
         variable try  : natural := 9; -- Intentos del jugador
     begin
         -- Asegurar que el proceso sea combinacional
 		nxt_state <= cur_state;
+        INTENTOS <= try;		
 		DONE_INCHECK <= "00";
 		
 		case cur_state is
@@ -63,41 +58,41 @@ begin
 				if START_INCHECK = '1' then -- Inicio del juego
 				    tmp_sequence := PARAM_SEQ;
 				    size := 4;
-				    try := 9;
 					nxt_state <= S1;
 				end if;
 
 	
 			when S1 =>
-                tmp_button_pushed := BTN; --Guardamos continuamente el valor de entrada de los botones
-                INTENTOS <= try; -- Mostrar por los displays los intentos
-			    if tmp_button_pushed /= "0000" then
+                 --Guardamos continuamente el valor de entrada de los botones
+			    if BTN /= "0000" and BTN /= "UUUU" then
                     nxt_state <= S2; -- Disparo el timer y paso a esperar
 			    end if;
 
 			when S2 =>
-                if tmp_button_pushed = tmp_sequence(size-1) then -- OK INPUT
+                if BTN = tmp_sequence(size-1) then -- OK INPUT
                     if size >= 1 then
                         size := size - 1;
                         nxt_state <= S1; -- Vuelta a esperar un input
-                    elsif size = 1 then
-                        nxt_state <= S3; -- WIN
                     end if;
-                elsif tmp_button_pushed /= tmp_sequence(size-1) then -- NO OK INPUT
+                elsif BTN /= tmp_sequence(size-1) then -- NO OK INPUT
                     if try >= 1 then
                         try := try - 1;
                         nxt_state <= S1; -- Vuelta a esperar un input
-                    elsif try < 1 then -- Si TRY era 1, significa que esta ronda era su ultimo intento.
-                        nxt_state <= S4; -- GAME OVER
                     end if;
                 end if;
-				
+                
+                if size < 1 then
+                    nxt_state <= S3; -- WIN
+				end if;
+				if try < 1 then -- Si TRY era 1, significa que esta ronda era su ultimo intento.
+                     nxt_state <= S4; -- GAME OVER
+                end if;
 			--when S3 => -- No los utilizo porq en S2 hago todas las comparaciones
                 
                 
 			when S3 =>
 			    DONE_INCHECK <= "01";
-                nxt_state <= S_STBY; -- Envio de se馻l de DONE
+                nxt_state <= S_STBY; -- Envio de se帽al de DONE
 				
 			--when S5 =>
 
@@ -110,5 +105,7 @@ begin
                 DONE_INCHECK <= "00";
                 nxt_state <= S_STBY; -- En caso de fallo, volver al estado de espera.	
 		end case;
+		
+		STATE <= cur_state;
 	end process;
 end Behavioral;
