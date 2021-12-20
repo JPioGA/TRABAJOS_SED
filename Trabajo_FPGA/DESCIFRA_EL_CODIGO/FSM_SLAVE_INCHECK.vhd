@@ -22,6 +22,10 @@ architecture Behavioral of FSM_SLAVE_INCHECK is
     -- Señales utilizadas
     signal cur_state	 : STATE_SLAVE_T;				-- Estado actual
 	signal nxt_state	 : STATE_SLAVE_T;				-- Estado siguiente
+	signal cur_size : natural := 4;
+	signal nxt_size : natural;
+	signal cur_try : natural := 9; -- Intentos del jugador
+	signal nxt_try : natural;
 	
     --signal tmp_button           : std_logic; -- Señal que indica el inicio de la comparación
     --signal tmp_button_pushed    : std_logic_vector (3 downto 0) := "0000";  -- Botón pulsado por el jugador
@@ -36,8 +40,13 @@ begin
 	begin
 		if RST_N = '0' then -- Si entra un reset, mandar a reposo la máquina de estados
 			cur_state <= S_STBY;
-		elsif rising_edge(CLK) or falling_edge(CLK) then
+			cur_size <= 4;
+			cur_try <= 4;
+		--elsif rising_edge(CLK) or falling_edge(CLK) then
+		elsif rising_edge(CLK) then
 			cur_state <= nxt_state;
+			cur_size <= nxt_size;
+			cur_try <= nxt_try;
 		end if;
 	end process;
 	
@@ -45,19 +54,22 @@ begin
     nxt_state_decoder: process(cur_state, START_INCHECK, BTN)
         variable tmp_sequence :  SEQUENCE_T;
         --variable tmp_button_pushed    : std_logic_vector (3 downto 0) := "0000"; -- Botón pulsado por el jugador
-        variable size : natural := 4;
-        variable try  : natural := 9; -- Intentos del jugador
+        --variable size : natural := 4;
+        --variable try  : natural := 9; -- Intentos del jugador
     begin
         -- Asegurar que el proceso sea combinacional
 		nxt_state <= cur_state;
-        INTENTOS <= try;		
+		nxt_size <= cur_size;
+		nxt_try <= cur_try;
+        INTENTOS <= cur_try;		
 		DONE_INCHECK <= "00";
 		
 		case cur_state is
 			when S_STBY =>
 				if START_INCHECK = '1' then -- Inicio del juego
 				    tmp_sequence := PARAM_SEQ;
-				    size := 4;
+				    nxt_size <= 4;
+				    nxt_try <= 4;
 					nxt_state <= S1;
 				end if;
 
@@ -69,33 +81,30 @@ begin
 			    end if;
 
 			when S2 =>
-                if BTN = tmp_sequence(size-1) then -- OK INPUT
-                    if size >= 1 then
-                        size := size - 1;
+                if BTN = tmp_sequence(cur_size-1) then -- OK INPUT
+                    if cur_size >= 1 then
+                        nxt_size <= cur_size - 1;
                         nxt_state <= S1; -- Vuelta a esperar un input
                     end if;
-                elsif BTN /= tmp_sequence(size-1) then -- NO OK INPUT
-                    if try >= 1 then
-                        try := try - 1;
+                elsif BTN /= tmp_sequence(cur_size-1) then -- NO OK INPUT
+                    if cur_try >= 1 then
+                        nxt_try <= cur_try - 1;
                         nxt_state <= S1; -- Vuelta a esperar un input
                     end if;
                 end if;
                 
-                if size < 1 then
+                if cur_size < 1 then
                     nxt_state <= S3; -- WIN
 				end if;
-				if try < 1 then -- Si TRY era 1, significa que esta ronda era su ultimo intento.
+				if cur_try < 1 then -- Si TRY era 1, significa que esta ronda era su ultimo intento.
                      nxt_state <= S4; -- GAME OVER
                 end if;
-			--when S3 => -- No los utilizo porq en S2 hago todas las comparaciones
                 
                 
 			when S3 =>
 			    DONE_INCHECK <= "01";
                 nxt_state <= S_STBY; -- Envio de señal de DONE
 				
-			--when S5 =>
-
 				
 			when S4 =>
                 DONE_INCHECK <= "10";

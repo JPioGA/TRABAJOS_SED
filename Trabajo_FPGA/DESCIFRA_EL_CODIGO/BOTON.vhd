@@ -5,7 +5,7 @@ use ieee.std_logic_unsigned.all;
 
 entity BOTON is
 	port ( 
-			CLK100MHZ	: in     std_logic;
+			CLK	: in     std_logic;
 			BTNC		: in     std_logic;
 			BUTTON_PUSHED:out	 std_logic
 		);
@@ -32,8 +32,14 @@ architecture structural of BOTON is
     signal EDGED: std_logic;
     
 begin
-sincronizador:  synchrnzr 	port map (CLK100MHZ, BTNC, SYNC); 
-flanqueador:    edgedtctr 	port map (CLK100MHZ, SYNC, EDGED);
-BUTTON_PUSHED <= EDGED;
+    sincronizador:  synchrnzr
+        port map (  CLK => CLK,
+                    ASYNC_IN => BTNC,
+                    SYNC_OUT => SYNC);
+    flanqueador:    edgedtctr
+        port map (  CLK => CLK,
+                    SYNC_IN=> SYNC,
+                    EDGE => EDGED);
+    BUTTON_PUSHED <= EDGED;
 
 end architecture structural;
