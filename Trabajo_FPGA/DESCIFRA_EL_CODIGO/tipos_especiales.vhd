@@ -41,7 +41,12 @@ package tipos_especiales is
         S7,     -- S7: WIN 
         S8      -- S8: GAMEOVER
     );
-    
+     type STATE_SHOWSEQ_T is (
+        S_STBY, -- S_STBY: ESPERA INICIO DE JUEGO.
+        S0,    
+        S1,
+        S2
+    );
     -- DECLARACIÓN DE COMPONENTES UTILIZADOS (para ahorrar espacio y limpieza del código)
     component COMPARATOR is
         port ( CLK  : in std_logic; -- Señal de reloj
@@ -56,7 +61,7 @@ package tipos_especiales is
         port (  CLK         : in std_logic;
                 RST_N       : in std_logic;
                 NEW_SEQ     : out std_logic;   -- Señal de salida que indica cuando se ha generado una nueva secuencia ()
-                RETURN_LFSR : out SEQUENCE2_T); -- Señal de reset asíncrona. OJO! Nunca reinicial el valor del registro de estados con TODO 0. Se bloquea.
+                RETURN_LFSR : out SEQUENCE_T); -- Señal de reset asíncrona. OJO! Nunca reinicial el valor del registro de estados con TODO 0. Se bloquea.
     end component;
     
     
@@ -108,7 +113,7 @@ package tipos_especiales is
                 START_TIMER   : out std_logic;
                 DONE_TIMER    : in std_logic;
                 -- Interfaz entre MASTER y LFSR
-                RAND_SEQ      : in SEQUENCE2_T;
+                RAND_SEQ      : in SEQUENCE_T;
                 DONE_LFSR     : in std_logic;
                 -- Interfaz entre MASTER e INCHECK
                 START_INCHECK : out std_logic;
