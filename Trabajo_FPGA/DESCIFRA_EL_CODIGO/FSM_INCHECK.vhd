@@ -76,15 +76,11 @@ begin
                     nxt_state <= S3;
                 elsif PARAM_SEQ(cur_size-1) = "11" then -- Paso a esperar RIGHT_BTN
                     nxt_state <= S4;
-                --else
-                    --nxt_state <= S8; -- En caso de error pasas a GAME OVER
                 end if;
-                    
-                    
+                           
 
 			when S1 =>
 			    if UP_BTN = '1' then
-			        
 					nxt_state <= S5; -- OK
 			    elsif (DOWN_BTN = '1')OR(RIGHT_BTN = '1')OR(LEFT_BTN = '1') then
 			        nxt_state <= S6; -- NO OK
@@ -114,10 +110,10 @@ begin
 				end if;
                 
             when S5 => -- INPUT OK
-                if cur_size >= 1 then 
+                if cur_size > 1 then 
                     nxt_size <= cur_size - 1;
                     nxt_state <= S0; 
-                elsif cur_size < 1 then
+                elsif cur_size <= 1 then
                     nxt_state <= S7; -- WIN
                 end if;
                 

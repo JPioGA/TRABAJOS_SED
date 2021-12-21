@@ -56,7 +56,7 @@ package tipos_especiales is
         port (  CLK         : in std_logic;
                 RST_N       : in std_logic;
                 NEW_SEQ     : out std_logic;   -- Señal de salida que indica cuando se ha generado una nueva secuencia ()
-                RETURN_LFSR : out SEQUENCE_T); -- Señal de reset asíncrona. OJO! Nunca reinicial el valor del registro de estados con TODO 0. Se bloquea.
+                RETURN_LFSR : out SEQUENCE2_T); -- Señal de reset asíncrona. OJO! Nunca reinicial el valor del registro de estados con TODO 0. Se bloquea.
     end component;
     
     
@@ -108,7 +108,7 @@ package tipos_especiales is
                 START_TIMER   : out std_logic;
                 DONE_TIMER    : in std_logic;
                 -- Interfaz entre MASTER y LFSR
-                RAND_SEQ      : in SEQUENCE_T;
+                RAND_SEQ      : in SEQUENCE2_T;
                 DONE_LFSR     : in std_logic;
                 -- Interfaz entre MASTER e INCHECK
                 START_INCHECK : out std_logic;

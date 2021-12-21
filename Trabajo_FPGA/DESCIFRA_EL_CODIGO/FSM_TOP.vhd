@@ -30,7 +30,7 @@ architecture Behavioral of FSM_TOP is
     signal timer_start : std_logic;
     signal timer_done  : std_logic;
         -- Interfaz entre MASTER y LFSR
-    signal lfsr_seq    : SEQUENCE_T;
+    signal lfsr_seq    : SEQUENCE2_T;
     signal lfsr_done   : std_logic;
     
     
