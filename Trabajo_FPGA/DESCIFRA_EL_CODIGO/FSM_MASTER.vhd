@@ -12,8 +12,8 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use work.tipos_especiales.ALL;
 
 entity FSM_MASTER is
-    generic( TEST_SEQ : SEQUENCE_T := ("0001", "0010", "0100", "1000")
-    ); -- Secuencia de prueba (Para no usar FSM) (UP-DOWN-LEFT-RIGHT)
+    generic(    TEST_SEQ : SEQUENCE_T := ("0001", "0010", "0100", "1000");
+                TEST_SEQ_2 : SEQUENCE2_T := ("00", "01", "10", "11")); -- Secuencia de prueba (Para no usar LFSR) (UP-DOWN-LEFT-RIGHT)
     port (  CLK : in std_logic;
             RST_N : in std_logic;
             OK_BUTTON   : in std_logic;
@@ -24,12 +24,13 @@ entity FSM_MASTER is
             DONE_TIMER  : in std_logic;
             
             -- Interfaz entre MASTER y LFSR
-            RAND_SEQ    : in SEQUENCE_T;
+            RAND_SEQ    : in SEQUENCE2_T;
             DONE_LFSR   : in std_logic;
             
             -- Interfaz entre MASTER e INCHECK
             START_INCHECK : out std_logic;
-            PARAM_SEQ     : out SEQUENCE_T;
+            --PARAM_SEQ     : out SEQUENCE_T;
+            PARAM_SEQ     : out SEQUENCE2_T;
             DONE_INCHECK : in std_logic_vector(1 downto 0) -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
             );
 end FSM_MASTER;
@@ -38,7 +39,8 @@ architecture Behavioral of FSM_MASTER is
     -- Declaración de señales utilizadas en el juego
     signal cur_state	 : STATE_MASTER_T; -- Estado actual
 	signal nxt_state	 : STATE_MASTER_T; -- Estado siguiente
-	signal game_sequence : SEQUENCE_T;     -- Secuencia a adivinar por el jugador
+	--signal game_sequence : SEQUENCE_T;     -- Secuencia a adivinar por el jugador
+	signal game_sequence : SEQUENCE2_T;     -- Secuencia a adivinar por el jugador
 	
 begin
     -- Actualización de los estados
@@ -53,7 +55,7 @@ begin
     
     
     -- TRANSICIONES DE ESTADO
-    nxt_state_decoder: process(CLK, cur_state)
+    nxt_state_decoder: process(cur_state,OK_BUTTON,DONE_TIMER,DONE_INCHECK)
     begin
         -- Asegurar que el proceso sea combinacional
 		nxt_state <= cur_state;
@@ -65,13 +67,13 @@ begin
 				end if;
 				
 			when S0 =>
---			    if DONE_LFSR = '1' then -- Llegada de una nueva secuencia
---                    game_sequence <= RAND_SEQ; -- Cargo la nueva secuencia a adivinar en la señal auxiliar
---                    nxt_state <= S1; -- Tras recibir la nueva secuencia, paso al siguiente estado
---				end if;
+			    if DONE_LFSR = '1' then -- Llegada de una nueva secuencia
+                    game_sequence <= RAND_SEQ; -- Cargo la nueva secuencia a adivinar en la señal auxiliar
+                    nxt_state <= S1; -- Tras recibir la nueva secuencia, paso al siguiente estado
+				end if;
                 -- Sin el LFSR. 
-				game_sequence <= TEST_SEQ;
-				nxt_state <= S1;
+--				game_sequence <= TEST_SEQ_2;
+--				nxt_state <= S1;
 				
 			when S1 =>
                 nxt_state <= S1_WT; -- Disparo el timer y paso a esperar
@@ -146,13 +148,13 @@ begin
                 START_TIMER <= '1';
 				
 			when S3_WT =>
-                OUT_MESSAGE <= "010"; -- WIN MESSAGE
+                OUT_MESSAGE <= "100"; -- WIN MESSAGE
 							
 			when S4 =>
                 START_TIMER <= '1'; 
                 
 			when S4_WT => 
-                OUT_MESSAGE <= "100"; -- GAME OVER MESSAGE
+                OUT_MESSAGE <= "011"; -- GAME OVER MESSAGE
 				
 			when others =>
                 START_TIMER     <= '0';

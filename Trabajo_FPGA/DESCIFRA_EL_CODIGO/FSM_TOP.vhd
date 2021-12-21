@@ -23,14 +23,14 @@ architecture Behavioral of FSM_TOP is
     -- SEÑALES de INTERCONEXIÖN de COMPONENTES
         -- Interfaz entre MASTER e INCHECK
     signal incheck_start : std_logic;
-    signal incheck_param : SEQUENCE_T;
+    signal incheck_param : SEQUENCE2_T;
     signal incheck_done : std_logic_vector(1 downto 0);
     signal incheck_trys : natural range 0 to 10;
         -- Interfez entre MASTER y TIMER
     signal timer_start : std_logic;
     signal timer_done  : std_logic;
         -- Interfaz entre MASTER y LFSR
-    signal lfsr_seq    : SEQUENCE_T;
+    signal lfsr_seq    : SEQUENCE2_T;
     signal lfsr_done   : std_logic;
     
     
@@ -63,12 +63,17 @@ begin
                     NEW_SEQ => lfsr_done,
                     RETURN_LFSR => lfsr_seq);
                     
-    inst_incheck: FSM_SLAVE_INCHECK
+    --inst_incheck: FSM_SLAVE_INCHECK
+    inst_incheck: FSM_INCHECK
         port map(   CLK           => CLK,
                     RST_N         => RST_N,
                     START_INCHECK => incheck_start,
                     PARAM_SEQ     => incheck_param,
-                    BTN           => BUTTON(4 downto 1), -- Todos los botones menos el OK_BUTTON
+                    --BTN => BUTTON(4 downto 1),
+                    UP_BTN        => BUTTON(1), -- Todos los botones menos el OK_BUTTON
+                    DOWN_BTN        => BUTTON(2),
+                    LEFT_BTN        => BUTTON(3),
+                    RIGHT_BTN        => BUTTON(4),                    
                     --LED           => LED,
                     DONE_INCHECK  => incheck_done,
                     INTENTOS => ATTEMPS);

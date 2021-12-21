@@ -4,6 +4,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 package tipos_especiales is
     -- DECLARACIÓN DE TIPOS UTILIZADOS EN LA FSM
     type SEQUENCE_T is array (3 downto 0) of std_logic_vector(3 downto 0);
+    type SEQUENCE2_T is array (3 downto 0) of std_logic_vector(1 downto 0);
     type STATE_MASTER_T is (
         S_STBY, -- S_STBY: ESPERA INICIO DE JUEGO. Hasta que no se pulse OK_BUTTON no se pasa al estado S0.
         S0,		-- S0: Estado de generación de la secuencia a adivinar por el jugador
@@ -22,11 +23,30 @@ package tipos_especiales is
         S1,		-- S1: Espera a un input del jugador
         S2,		-- S2: Comprobación del input
         S3,		-- S3: Input OK. Comprobación si se ha terminado la secuencia
-        S4     -- S4: WIN. Todos los inputs se introdujeron correctamente
-        --S5,		-- S5: Input NO OK. Comprobación si se han termiando los TRYS
-        --S6		-- S6: GAME OVER. Se acabaron los intentos
+        S4      -- S4: WIN. Todos los inputs se introdujeron correctamente
     );
-    
+    type STATE_INCHECK_T is (
+        S_STBY, -- S_STBY: ESPERA INICIO DE JUEGO.
+        S0,     -- S0: Comprobación del elemete de la secuencia a detectar
+        S1,		-- S1: Esperando UP
+        --S1_WT,
+        S2,		-- S2: Esperando DOWN
+        --S2_WT,
+        S3,		-- S3: Esperando LEFT
+        --S3_WT,
+        S4,     -- S4: Esperando RIGHT
+        --S4_WT,
+        S5,		-- S5: INPUT OK.
+        S6,		-- S6: INPUT OK.
+        S7,     -- S7: WIN 
+        S8      -- S8: GAMEOVER
+    );
+     type STATE_SHOWSEQ_T is (
+        S_STBY, -- S_STBY: ESPERA INICIO DE JUEGO.
+        S0,    
+        S1,
+        S2
+    );
     -- DECLARACIÓN DE COMPONENTES UTILIZADOS (para ahorrar espacio y limpieza del código)
     component COMPARATOR is
         port ( CLK  : in std_logic; -- Señal de reloj
@@ -58,10 +78,29 @@ package tipos_especiales is
                 RST_N           : in std_logic;
                 START_INCHECK   : in std_logic;  -- Señal de inicio de la comparación
                 PARAM_SEQ       : in SEQUENCE_T; -- Secuencia aleatoria a adivinar por el jugador
-                BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
+                --BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
+                UP_BTN          : in std_logic;
+                DOWN_BTN          : in std_logic;
+                LEFT_BTN          : in std_logic;
+                RIGHT_BTN          : in std_logic;
                 --LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER según se vayan encendiendo los LEDS.
                 DONE_INCHECK    : out std_logic_vector(1 downto 0);
                 INTENTOS        : out natural range 0 to 10); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
+    end component;
+    
+    
+    component FSM_INCHECK is
+    port (  CLK : in STD_LOGIC;
+            RST_N           : in std_logic;
+            START_INCHECK   : in std_logic;  -- SeÃ±al de inicio de la comparaciÃ³n
+            PARAM_SEQ       : in SEQUENCE2_T; -- Secuencia aleatoria a adivinar por el jugador
+            UP_BTN          : in std_logic;
+            DOWN_BTN        : in std_logic;
+            LEFT_BTN        : in std_logic;
+            RIGHT_BTN       : in std_logic;
+            --LED           : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER segÃºn se vayan encendiendo los LEDS.
+            DONE_INCHECK    : out std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
+            INTENTOS        : out natural range 0 to 9);
     end component;
     
     
@@ -78,7 +117,7 @@ package tipos_especiales is
                 DONE_LFSR     : in std_logic;
                 -- Interfaz entre MASTER e INCHECK
                 START_INCHECK : out std_logic;
-                PARAM_SEQ     : out SEQUENCE_T;
+                PARAM_SEQ     : out SEQUENCE2_T;
                 DONE_INCHECK  : in std_logic_vector(1 downto 0)); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
     end component;
     

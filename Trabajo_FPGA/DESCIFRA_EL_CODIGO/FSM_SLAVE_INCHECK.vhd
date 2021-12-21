@@ -1,7 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
 use work.tipos_especiales.ALL;
 
 entity FSM_SLAVE_INCHECK is
@@ -9,10 +8,14 @@ entity FSM_SLAVE_INCHECK is
             RST_N           : in std_logic;
             START_INCHECK   : in std_logic;  -- Señal de inicio de la comparación
             PARAM_SEQ       : in SEQUENCE_T; -- Secuencia aleatoria a adivinar por el jugador
-            BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
+            --BTN             : in std_logic_vector (3 downto 0); -- Entrada de botones pulsados. 
+            UP_BTN          : in std_logic;
+            DOWN_BTN          : in std_logic;
+            LEFT_BTN          : in std_logic;
+            RIGHT_BTN          : in std_logic;
             --LED             : out std_logic_vector (3 downto 0); -- LEDS a ENCENDER según se vayan encendiendo los LEDS.
             DONE_INCHECK    : out std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
-            INTENTOS        : out natural range 0 to 10
+            INTENTOS        : out natural range 0 to 9
                     
             );
 end FSM_SLAVE_INCHECK;
@@ -26,14 +29,13 @@ architecture Behavioral of FSM_SLAVE_INCHECK is
 	signal nxt_size : natural;
 	signal cur_try : natural := 9; -- Intentos del jugador
 	signal nxt_try : natural;
-	
+	signal BTN     : std_logic_vector (3 downto 0);
     --signal tmp_button           : std_logic; -- Señal que indica el inicio de la comparación
     --signal tmp_button_pushed    : std_logic_vector (3 downto 0) := "0000";  -- Botón pulsado por el jugador
     --signal tmp_sequence :  SEQUENCE_T;
     --signal tmp_elem_to_compare   : std_logic_vector (3 downto 0); -- Elemento de la secuencia a comparar con el botón del juagador
     --signal tmp_result_comp      : std_logic; -- Señal que indica el resultado de la comparación entre el botón pulsado y secuencia 
-begin
-
+begin    
 
     -- Actualización de los estados
 	state_register: process(CLK, RST_N)
@@ -64,6 +66,11 @@ begin
         INTENTOS <= cur_try;		
 		DONE_INCHECK <= "00";
 		
+		BTN(0) <= UP_BTN;
+        BTN(1) <= DOWN_BTN;
+        BTN(2) <= LEFT_BTN;
+        BTN(3) <= RIGHT_BTN;
+    
 		case cur_state is
 			when S_STBY =>
 				if START_INCHECK = '1' then -- Inicio del juego
