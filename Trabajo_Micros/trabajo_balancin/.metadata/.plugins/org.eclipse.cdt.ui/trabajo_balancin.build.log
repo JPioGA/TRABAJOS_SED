@@ -1,0 +1,10 @@
+20:02:19 **** Incremental Build of configuration Debug for project trabajo_balancin ****
+make -j16 all 
+arm-none-eabi-size   trabajo_balancin.elf 
+   text	   data	    bss	    dec	    hex	filename
+  17476	     20	   1916	  19412	   4bd4	trabajo_balancin.elf
+Finished building: default.size.stdout
+ 
+
+20:02:19 Build Finished. 0 errors, 0 warnings. (took 297ms)
+

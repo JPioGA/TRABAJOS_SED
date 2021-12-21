@@ -1,0 +1,10 @@
+main.c:76:9:map_acc	24	static
+main.c:83:9:map_adc	24	static
+main.c:93:5:main	16	static
+main.c:235:6:SystemClock_Config	88	static
+main.c:279:13:MX_ADC1_Init	24	static
+main.c:329:13:MX_SPI1_Init	8	static
+main.c:367:13:MX_TIM2_Init	64	static
+main.c:426:13:MX_GPIO_Init	48	static
+main.c:477:6:HAL_TIM_PeriodElapsedCallback	16	static
+main.c:494:6:Error_Handler	4	static,ignoring_inline_asm
