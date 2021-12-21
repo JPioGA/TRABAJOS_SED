@@ -48,7 +48,7 @@ begin
                 end if;
             when "010" => --go
                 if anode_s mod 2 = 0 then
-                    segments <= "0000100";
+                    segments <= "0100001";
                     anode <= "01111111";
                 else
                     segments <= "0000001";
