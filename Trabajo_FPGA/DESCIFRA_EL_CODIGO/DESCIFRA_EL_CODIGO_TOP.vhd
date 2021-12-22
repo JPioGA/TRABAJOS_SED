@@ -13,7 +13,8 @@ entity DESCIFRA_EL_CODIGO_TOP is
             CPU_RESETN  : in std_logic;
             BTN         : in std_logic_vector(4 downto 0);
             anode       : out std_logic_vector(7 downto 0);
-            segment     : out std_logic_vector(6 downto 0)
+            segment     : out std_logic_vector(6 downto 0);
+            JA          : out std_logic_vector(3 downto 0)
     
     );
 end DESCIFRA_EL_CODIGO_TOP;
@@ -31,7 +32,7 @@ architecture STRUCTURAL of DESCIFRA_EL_CODIGO_TOP is
         port (  CLK : in std_logic;
                 RST_N : in std_logic;
                 BUTTON   : in std_logic_vector(4 downto 0); -- ( 0 OK - 1 UP -  2 DOWN - 3 LEFT -  4 RIGHT)
-                --LED      : out std_logic_vector(3 downto 0); -- 
+                LED      : out std_logic_vector(3 downto 0); -- 
                 ATTEMPS : out natural range 0 to 9;
                 OUT_MESSAGE : out std_logic_vector(2 downto 0));
     end component;
@@ -62,6 +63,7 @@ begin
         port map(   CLK => CLK100MHZ,
                     RST_N => CPU_RESETN,
                     BUTTON => sig_botones,
+                    LED => JA,
                     ATTEMPS => sig_intentos,
                     OUT_MESSAGE => sig_mensajes);
                     

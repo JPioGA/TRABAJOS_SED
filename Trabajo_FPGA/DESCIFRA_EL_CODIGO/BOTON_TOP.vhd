@@ -13,7 +13,7 @@ entity BOTON_TOP is
 end BOTON_TOP;
 
 architecture structural of BOTON_TOP is
-    component BOTON is
+    component BOTON_DEBOUNCER is
     port ( 
                 CLK	: in     std_logic;
                 BTNC		: in     std_logic;
@@ -22,10 +22,10 @@ architecture structural of BOTON_TOP is
     end component;
     
 begin
-    Boton_ok:		BOTON port map(CLK => CLK, BTNC => Button_in(0), BUTTON_PUSHED => Button_out(0));
-    Boton_up:		BOTON port map(CLK => CLK, BTNC => Button_in(1), BUTTON_PUSHED => Button_out(1));
-    Boton_down:		BOTON port map(CLK => CLK, BTNC => Button_in(2), BUTTON_PUSHED => Button_out(2));
-    Boton_left:		BOTON port map(CLK => CLK, BTNC => Button_in(3), BUTTON_PUSHED => Button_out(3));
-    Boton_right:	BOTON port map(CLK => CLK, BTNC => Button_in(4), BUTTON_PUSHED => Button_out(4));
+    Boton_ok:		BOTON_DEBOUNCER port map(CLK => CLK, BTNC => Button_in(0), BUTTON_PUSHED => Button_out(0));
+    Boton_up:		BOTON_DEBOUNCER port map(CLK => CLK, BTNC => Button_in(1), BUTTON_PUSHED => Button_out(1));
+    Boton_down:		BOTON_DEBOUNCER port map(CLK => CLK, BTNC => Button_in(2), BUTTON_PUSHED => Button_out(2));
+    Boton_left:		BOTON_DEBOUNCER port map(CLK => CLK, BTNC => Button_in(3), BUTTON_PUSHED => Button_out(3));
+    Boton_right:	BOTON_DEBOUNCER port map(CLK => CLK, BTNC => Button_in(4), BUTTON_PUSHED => Button_out(4));
     
 end architecture structural;

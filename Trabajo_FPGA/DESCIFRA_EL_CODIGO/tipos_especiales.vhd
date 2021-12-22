@@ -15,7 +15,9 @@ package tipos_especiales is
         S3,     -- S3: WIN. Disparo de TIMER para mostrar el mensaje al ganar el 
         S3_WT,  -- S3_WT: Tiempo de espera de muestra del mensaje WIN
         S4,		-- S3: GAME OVER. Disparo de TIMER para mostrar el mensaje al perder el juego.
-        S4_WT   -- S4_WT: Tiempo de espera de muestra del mensaje GAME OVER
+        S4_WT,  -- S4_WT: Tiempo de espera de muestra del mensaje GAME OVER
+        S5,     -- S5: Disparo de SHOWSEQ
+        S5_WT   -- S5_WT: Espera al finalizar la muestra de la secuencia.
     );
     
     type STATE_SLAVE_T is (
@@ -40,6 +42,13 @@ package tipos_especiales is
         S6,		-- S6: INPUT OK.
         S7,     -- S7: WIN 
         S8      -- S8: GAMEOVER
+    );
+    
+    type STATE_SHOWSEQ_T is (
+        S_STBY, -- S_STBY: ESPERA al disparo de SHOWSEQ
+        S0,		-- S1: Espera a un input del jugador
+        S1,		-- S2: Comprobación del input
+        S2		-- S3: Input OK. Comprobación si se ha terminado la secuencia
     );
     
     -- DECLARACIÓN DE COMPONENTES UTILIZADOS (para ahorrar espacio y limpieza del código)
@@ -99,6 +108,18 @@ package tipos_especiales is
     end component;
     
     
+    component FSM_SHOWSEQ is
+        port(   CLK         : in std_logic;
+                RST_N       : in std_logic;
+                PARAM_SEQ   : in SEQUENCE2_T; -- Secuencia aleatoria a adivinar por el jugador
+                START_TIMER : out std_logic;
+                DONE_TIMER  : in std_logic;
+                START_SHOWSEQ : in std_logic;      
+                DONE_SHOWSEQ  : out std_logic;
+                LEDS        : out std_logic_vector(3 downto 0));
+                --STATE       : out STATE_SHOWSEQ_T);
+    end component;
+    
     component FSM_MASTER is
         port (  CLK           : in std_logic;
                 RST_N         : in std_logic;
@@ -112,9 +133,14 @@ package tipos_especiales is
                 DONE_LFSR     : in std_logic;
                 -- Interfaz entre MASTER e INCHECK
                 START_INCHECK : out std_logic;
-                PARAM_SEQ     : out SEQUENCE2_T;
-                DONE_INCHECK  : in std_logic_vector(1 downto 0)); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
+                PARAM_SEQ_incheck     : out SEQUENCE2_T;
+                DONE_INCHECK  : in std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
+                -- Interfaz entre MASTER e SHOWSEQ
+                START_SHOWSEQ : out std_logic;
+                PARAM_SEQ_showseq : out SEQUENCE2_T;
+                DONE_SHOWSEQ : in std_logic);
     end component;
+    
     
 end tipos_especiales;
 

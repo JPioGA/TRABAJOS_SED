@@ -3,15 +3,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-entity BOTON is
+entity BOTON_DEBOUNCER is
 	port ( 
 			CLK	: in     std_logic;
 			BTNC		: in     std_logic;
 			BUTTON_PUSHED:out	 std_logic
 		);
-end BOTON;
+end BOTON_DEBOUNCER;
 
-architecture structural of BOTON is
+architecture structural of BOTON_DEBOUNCER is
 
     component debouncer
         port(

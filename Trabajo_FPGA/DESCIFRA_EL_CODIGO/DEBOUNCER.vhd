@@ -12,7 +12,7 @@ end debouncer;
 
 architecture logic of debouncer is
 
-    constant delay : integer := 2; 
+    constant delay : integer := 200000; 
     signal count : integer := 0;
     signal btn_tmp : std_logic := '0';
 

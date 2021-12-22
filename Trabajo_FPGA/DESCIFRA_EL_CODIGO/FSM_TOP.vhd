@@ -14,7 +14,7 @@ entity FSM_TOP is
     port (  CLK : in std_logic;
             RST_N : in std_logic;
             BUTTON   : in std_logic_vector(4 downto 0); -- ( 0 OK - 1 UP -  2 DOWN - 3 LEFT -  4 RIGHT)
-            --LED      : out std_logic_vector(3 downto 0); -- 
+            LED      : out std_logic_vector(3 downto 0); -- 
             ATTEMPS : out natural range 0 to 10;
             OUT_MESSAGE : out std_logic_vector(2 downto 0)); -- "000" si nada // "001" si START // "010" si GO // "011" si GAME OVER // "100" si WIN
 end FSM_TOP;
@@ -29,9 +29,16 @@ architecture Behavioral of FSM_TOP is
         -- Interfez entre MASTER y TIMER
     signal timer_start : std_logic;
     signal timer_done  : std_logic;
+        -- Interfaz entre SHOWSEQ y TIMER
+    signal timer_start_showseq : std_logic;
+    signal timer_done_showseq : std_logic;
         -- Interfaz entre MASTER y LFSR
     signal lfsr_seq    : SEQUENCE2_T;
     signal lfsr_done   : std_logic;
+        -- Interfaz entre MASTER y SHOWSEQ
+    signal showseq_start : std_logic;
+    signal showseq_param : SEQUENCE2_T;
+    signal showseq_done : std_logic;
     
     
 begin
@@ -48,8 +55,12 @@ begin
                     DONE_LFSR     => lfsr_done,
                     -- Interfaz entre MASTER e INCHECK
                     START_INCHECK => incheck_start,
-                    PARAM_SEQ     => incheck_param,
-                    DONE_INCHECK  => incheck_done);
+                    PARAM_SEQ_incheck     => incheck_param,
+                    DONE_INCHECK  => incheck_done,
+                    -- Interfaz entre MASTER e SHOWSEQ
+                    START_SHOWSEQ => showseq_start,
+                    PARAM_SEQ_showseq => showseq_param,
+                    DONE_SHOWSEQ => showseq_done);
                     
     inst_timer: FSM_SLAVE_TIMER
         port map(   CLK         => CLK,
@@ -69,12 +80,27 @@ begin
                     RST_N         => RST_N,
                     START_INCHECK => incheck_start,
                     PARAM_SEQ     => incheck_param,
-                    --BTN => BUTTON(4 downto 1),
                     UP_BTN        => BUTTON(1), -- Todos los botones menos el OK_BUTTON
                     DOWN_BTN        => BUTTON(2),
                     LEFT_BTN        => BUTTON(3),
                     RIGHT_BTN        => BUTTON(4),                    
-                    --LED           => LED,
                     DONE_INCHECK  => incheck_done,
                     INTENTOS => ATTEMPS);
+                    
+    inst_showseq: FSM_SHOWSEQ
+        port map(   CLK => CLK,
+                    RST_N => RST_N,
+                    START_SHOWSEQ => showseq_start,
+                    DONE_SHOWSEQ => showseq_done,
+                    PARAM_SEQ     => showseq_param,
+                    START_TIMER => timer_start_showseq,
+                    DONE_TIMER  => timer_done_showseq,
+                    LEDS => LED
+                    );
+                    
+     inst_timer_showseq: FSM_SLAVE_TIMER
+        port map(   CLK         => CLK,
+                    RST_N       => RST_N,
+                    START_TIMER => timer_start_showseq,
+                    DONE_TIMER  => timer_done_showseq);
 end Behavioral;

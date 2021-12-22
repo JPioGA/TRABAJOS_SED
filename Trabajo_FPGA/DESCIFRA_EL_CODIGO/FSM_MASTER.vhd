@@ -29,9 +29,13 @@ entity FSM_MASTER is
             
             -- Interfaz entre MASTER e INCHECK
             START_INCHECK : out std_logic;
-            --PARAM_SEQ     : out SEQUENCE_T;
-            PARAM_SEQ     : out SEQUENCE2_T;
-            DONE_INCHECK : in std_logic_vector(1 downto 0) -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
+            PARAM_SEQ_incheck     : out SEQUENCE2_T;
+            DONE_INCHECK : in std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
+            
+            -- Interfaz entre MASTER e SHOWSEQ
+            START_SHOWSEQ : out std_logic;
+            PARAM_SEQ_showseq : out SEQUENCE2_T;
+            DONE_SHOWSEQ : in std_logic
             );
 end FSM_MASTER;
 
@@ -98,7 +102,7 @@ begin
 				
 			when S3_WT =>
                 if DONE_TIMER = '1' then -- Fin de la espera
-					nxt_state <= S_STBY;
+					nxt_state <= S5;
 				end if;	
 							
 			when S4 =>
@@ -106,9 +110,16 @@ begin
                 
 			when S4_WT => 
                 if DONE_TIMER = '1' then -- Fin de la espera
-                    nxt_state <= S_STBY;
+                    nxt_state <= S5;
 				end if;
 				
+			when S5 =>
+                nxt_state <= S5_WT; -- Disparo el timer y paso a esperar
+                
+			when S5_WT =>
+                if DONE_SHOWSEQ = '1' then -- Fin de la espera
+                    nxt_state <= S_STBY;
+				end if;
 			when others =>
                 nxt_state <= S_STBY; -- En caso de fallo, volver al estado de espera.	
 		end case;
@@ -120,8 +131,10 @@ begin
     begin
         START_TIMER     <= '0';
         START_INCHECK   <= '0';
+        START_SHOWSEQ   <= '0';
         OUT_MESSAGE     <= "000";
-        PARAM_SEQ       <= ((others => '0'), (others => '0'), (others => '0'), (others => '0'));
+        PARAM_SEQ_incheck       <= ((others => '0'), (others => '0'), (others => '0'), (others => '0'));
+        PARAM_SEQ_showseq       <= ((others => '0'), (others => '0'), (others => '0'), (others => '0'));
         
         case cur_state is
 			when S_STBY =>
@@ -138,10 +151,10 @@ begin
 				
 			when S2 => 
                 START_INCHECK <= '1'; 
-                PARAM_SEQ <= game_sequence; -- Inicio del juego con la secuencia aleatoria
+                PARAM_SEQ_incheck <= game_sequence; -- Inicio del juego con la secuencia aleatoria
                 
 			when S2_WT =>
-				PARAM_SEQ <= game_sequence; -- Mantenimiento de la secuencia durante el juego
+				PARAM_SEQ_incheck <= game_sequence; -- Mantenimiento de la secuencia durante el juego
 				OUT_MESSAGE <= "101"; -- Imprimir intentos
 				
 			when S3 =>
@@ -155,7 +168,14 @@ begin
                 
 			when S4_WT => 
                 OUT_MESSAGE <= "011"; -- GAME OVER MESSAGE
-				
+			
+			when S5 =>
+                START_SHOWSEQ <= '1';
+                PARAM_SEQ_showseq <= game_sequence;
+                
+			when S5_WT =>
+                PARAM_SEQ_showseq <= game_sequence;
+					
 			when others =>
                 START_TIMER     <= '0';
                 START_INCHECK   <= '0';
