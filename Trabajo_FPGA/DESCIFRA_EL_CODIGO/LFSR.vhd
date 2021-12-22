@@ -57,23 +57,29 @@ begin
             
             case cur_size is
                 when 4 => -- Ningun elemento de la secuencia rellenado.
-                    aux_return(cur_size-1) <= aux_val;
+                    --aux_return(cur_size-1) <= aux_val;
+                    aux_return(3) <= aux_val;
                     nxt_size <= 3;
                 when 3 => -- 1 Elemento de la secuencia rellenado. Buscando el segundo
-                    if (aux_val /= aux_return(cur_size-1)) then
-                        aux_return(cur_size-2) <= aux_val;
+                    if (aux_return(3) /= aux_val) then
+                    --if (aux_val /= aux_return(cur_size)) then
+                        --aux_return(cur_size-1) <= aux_val;
+                        aux_return(2) <= aux_val;
                         nxt_size <= 2;
                     end if;
                     
                 when 2 => -- 2 Elementos de la secuencia rellenado. Buscando el tercero
-                    if (aux_val /= aux_return(cur_size-1)) OR (aux_val /= aux_return(cur_size-2)) then
-                        aux_return(cur_size-3) <= aux_val;
+                    if ((aux_return(3)/= aux_val) or (aux_return(2)/= aux_val)) then
+                    --if ((aux_val /= aux_return(cur_size)) and (aux_val /= aux_return(cur_size+1))) then
+                        --aux_return(cur_size-1) <= aux_val;
+                        aux_return(1) <= aux_val;
                         nxt_size <= 1;
                     end if;
                     
                 when 1 => -- 3 Elementos de la secuencia rellenado. Buscando el cuarto
-                    if (aux_val /= aux_return(cur_size-1)) OR (aux_val /= aux_return(cur_size-2)) OR (aux_val /= aux_return(cur_size-3)) then
-                        aux_return(cur_size-4) <= aux_val;
+                    if ((aux_return(3) /= aux_val) or (aux_return(2) /= aux_val) or (aux_return(1) /= aux_val)) then
+                        --aux_return(cur_size-1) <= aux_val;
+                        aux_return(0) <= aux_val;
                         nxt_size <= 0;
                     end if;
                 when 0 => -- SECEUNCIA RELLENADA. SACO EL RESULTADO Y VUELTA A EMPEZAR

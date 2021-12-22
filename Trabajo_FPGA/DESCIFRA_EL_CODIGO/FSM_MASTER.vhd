@@ -71,13 +71,13 @@ begin
 				end if;
 				
 			when S0 =>
-			    --if DONE_LFSR = '1' then -- Llegada de una nueva secuencia
-                    --game_sequence <= RAND_SEQ; -- Cargo la nueva secuencia a adivinar en la señal auxiliar
-                    --nxt_state <= S1; -- Tras recibir la nueva secuencia, paso al siguiente estado
-				--end if;
+			    if DONE_LFSR = '1' then -- Llegada de una nueva secuencia
+                    game_sequence <= RAND_SEQ; -- Cargo la nueva secuencia a adivinar en la señal auxiliar
+                    nxt_state <= S1; -- Tras recibir la nueva secuencia, paso al siguiente estado
+				end if;
                 -- Sin el LFSR. 
-				game_sequence <= TEST_SEQ_2;
-				nxt_state <= S1;
+				--game_sequence <= TEST_SEQ_2;
+				--nxt_state <= S1;
 				
 			when S1 =>
                 nxt_state <= S1_WT; -- Disparo el timer y paso a esperar
