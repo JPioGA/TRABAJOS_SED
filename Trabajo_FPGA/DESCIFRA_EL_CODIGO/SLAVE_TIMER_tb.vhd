@@ -20,7 +20,7 @@ signal  START_tb          :  std_logic;
 signal  DONE_tb           :  std_logic;
 
 begin
-uut : FSM_SLAVE_TIMER port map (CLK_tb, RSTN_tb, START_tb, PARAM_tb, DONE_tb );
+uut : FSM_SLAVE_TIMER port map (CLK_tb, RSTN_tb, START_tb, DONE_tb );
 
 CLK_tb<=not CLK_tb after 5ns;
 process
@@ -31,13 +31,13 @@ START_tb<='0';
 		wait for 10ns;
 		START_tb<='0';
 		
-		wait for 60ns; --Tiempo exclusivo para tb
+		wait for 200ns; --Tiempo exclusivo para tb (20 ciclos de reloj a 5ns)
 		
 		assert DONE_tb='1'
 		report "Tiempo fallido"
 		severity failure;
 		
-wait for 100ns;
+wait for 50ns;
 RSTN_tb<='0';
 
 		assert false

@@ -23,7 +23,7 @@ component FSM_INCHECK
             DONE_INCHECK    : out std_logic_vector(1 downto 0); -- "00" si NOT DONE // "01" si WIN // "10" si GAME OVER
             INTENTOS        : out natural range 0 to 9;
             
-            STATE           : out STATE_INCHECK_T);
+            STATE           : out STATE_INCHECK_T); --Necesario añadir esta salida en el diseño y actualizar con STATE <= cur_state
    end component;
    
 signal CLK             : std_logic  := '0';

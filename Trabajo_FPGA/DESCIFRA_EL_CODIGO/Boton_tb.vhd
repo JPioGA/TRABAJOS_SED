@@ -5,7 +5,7 @@ entity button_tb is
 end button_tb;
 
 architecture tb of button_tb is
-	component BOTON
+	component BOTON_DEBOUNCER
 	port ( 
 			CLK	: in     std_logic;
 			BTNC		: in     std_logic;
@@ -19,7 +19,7 @@ architecture tb of button_tb is
 	constant k  : time := 5ns;
 	
 begin
-	uut: BOTON port map (CLK => clk, BTNC => btn, BUTTON_PUSHED => botonpulsado);
+	uut: BOTON_DEBOUNCER port map (CLK => clk, BTNC => btn, BUTTON_PUSHED => botonpulsado);
 	
 	clk<=not clk after k;
 	

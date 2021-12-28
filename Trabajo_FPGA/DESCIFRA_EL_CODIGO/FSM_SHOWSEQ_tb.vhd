@@ -13,7 +13,7 @@ component FSM_SHOWSEQ
 port (
        CLK         : in std_logic;
        RST_N       : in std_logic;
-       PARAM_SEQ   : in SEQUENCE_T; -- Secuencia aleatoria a adivinar por el jugador
+       PARAM_SEQ   : in SEQUENCE2_T; -- Secuencia aleatoria a adivinar por el jugador
       
        START_TIMER : out std_logic;
        DONE_TIMER  : in std_logic; 
@@ -22,13 +22,13 @@ port (
        DONE_SHOWSEQ  : out std_logic;
        
        LEDS        : out std_logic_vector(3 downto 0);
-       STATE       : out STATE_SHOWSEQ_T
+       STATE       : out STATE_SHOWSEQ_T --Necesario añadir esta salida en el diseño y actualizar con STATE <= cur_state
 );
 end component;
 
 signal    CLK         : std_logic := '0';
 signal    RST_N       : std_logic;
-signal    PARAM_SEQ   : SEQUENCE_T := ("0001", "0010", "0100", "1000"); -- Secuencia aleatoria a adivinar por el jugador
+signal    PARAM_SEQ   : SEQUENCE2_T := ("00", "01", "10", "11"); -- Secuencia aleatoria a adivinar por el jugador
       
 signal    START_TIMER : std_logic;
 signal    DONE_TIMER  : std_logic; 
@@ -75,16 +75,24 @@ wait for 30ns;
 DONE_TIMER <= '1';
 wait for 5ns;
 DONE_TIMER <= '0';
+
+wait for 10ns;
+assert STATE = S0
+report "Timer incorrecto"
+severity failure;
+
 wait until STATE = S1;
 wait for 30ns;
 DONE_TIMER <= '1';
 wait for 5ns;
 DONE_TIMER <= '0';
+
 wait until STATE = S1;
 wait for 30ns;
 DONE_TIMER <= '1';
 wait for 5ns;
 DONE_TIMER <= '0';
+
 wait until STATE = S1;
 wait for 30ns;
 DONE_TIMER <= '1';
