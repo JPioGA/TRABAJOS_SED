@@ -1,0 +1,6 @@
+test.c:6:6:TestLines	40	static
+test.c:96:6:TestRectangles	40	static
+test.c:113:6:TestFilledRectangles	40	static
+test.c:131:6:TestFilledCircles	24	static
+test.c:148:6:TestCircles	24	static
+test.c:167:6:TestTriangles	56	static
