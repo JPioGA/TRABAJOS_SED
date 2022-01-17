@@ -52,9 +52,9 @@ TIM_HandleTypeDef htim4;
 	//Variables para comunicación SPI con el acelerómetro
 uint8_t spiTxBuf[2];
 uint8_t spiRxBuf[7];
-volatile int16_t accel_x, grad_accel_x;
-volatile int16_t accel_y, grad_accel_y;
-volatile int16_t accel_z, grad_accel_z;
+volatile int16_t accel_x, grad_accel_x, prev_x = 1500;
+volatile int16_t accel_y, grad_accel_y, prev_y = 1500;
+
 char buf_x[12];
 char buf_y[12];
 char buf2_x[16];
@@ -67,9 +67,9 @@ int16_t T_lights = 20000;
 int16_t angle_x;
 int16_t angle_y;
 int16_t lights_x;
-int16_t lights_y;
-int i = 0;
-int positive = 0;
+int16_t lights_y, lights_y_2;
+uint32_t start_x, start_y;
+
 
 uint32_t Kp = 1.05;
 
@@ -100,7 +100,7 @@ static void MX_TIM4_Init(void);
 int16_t map_acc(int16_t accel){
 	if (accel > 16384) return  T_lights;
 	else if (accel < -16384) return -T_lights;
-	//else if(accel < 1200 && accel > -1200) return 0;
+	else if(accel < 100 && accel > -100) return 0;
 	return (accel - (-16384)) * (T_lights - (-T_lights)) / (16384 - (-16384)) - T_lights;
 }
 
@@ -112,7 +112,7 @@ int16_t map_adc(int16_t adc){
 }
 
 int16_t map_angle(int16_t light){
-	return (light - (-T_lights)) * (2550 - 500) / (T_lights - (-T_lights)) + 500;
+	return (light - (-T_lights)) * (2500 - 500) / (T_lights - (-T_lights)) + 500;
 }
 /* USER CODE END 0 */
 
@@ -168,7 +168,8 @@ int main(void)
   HAL_SPI_Transmit(&hspi1,spiTxBuf,2,50);
   HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET); //Fin de la transmisión de datos por SPI
 
-
+  start_x = HAL_GetTick();
+  start_y = HAL_GetTick();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -209,20 +210,18 @@ int main(void)
 		  accel_y = (spiRxBuf[4]<<8)|spiRxBuf[3];
 
 
-		  lights_x = map_acc(accel_x) - 945;
-		  lights_y = map_acc(accel_y);
-
+		  lights_x = map_acc(accel_x); // -945
+		  lights_y = map_acc(accel_y) ;
 	  }
 	  else{
 		  HAL_ADC_Start(&hadc1);
-		  if(HAL_ADC_PollForConversion(&hadc1, 100)==HAL_OK){
-			  adcval_x = HAL_ADC_GetValue(&hadc1) - 450;
-			  if(adcval_x < 0) adcval_x = 0;
-		  }
+		  if(HAL_ADC_PollForConversion(&hadc1, 100)==HAL_OK)
+			  adcval_x = HAL_ADC_GetValue(&hadc1); // -450
 		  HAL_ADC_Stop(&hadc1);
 
 		  HAL_ADC_Start(&hadc2);
-		  if(HAL_ADC_PollForConversion(&hadc2, 100)==HAL_OK) adcval_y = HAL_ADC_GetValue(&hadc2);
+		  if(HAL_ADC_PollForConversion(&hadc2, 100)==HAL_OK)
+			  adcval_y = HAL_ADC_GetValue(&hadc2);
 		  HAL_ADC_Stop(&hadc2);
 
 		  lights_x = map_adc(adcval_x);
@@ -230,13 +229,27 @@ int main(void)
 	  }
 
 	  angle_x = map_angle(lights_x);
+	  angle_y = map_angle(-lights_y);
 
-	  if(mode == 0 || i++ == 20){
-		  angle_y = map_angle(lights_y);
-		  i = 0;}
 
-	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, angle_x);
-	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, angle_y);
+
+
+	  if(HAL_GetTick() - start_x > 2){
+		  if(prev_x < angle_x)
+		  	  prev_x += 1;
+		  else
+			  prev_x -= 1;
+		  start_x = HAL_GetTick();}
+
+	  if(HAL_GetTick() - start_y > 2){
+		  if(prev_y < angle_y)
+			  prev_y += 1;
+		  else
+			  prev_y -= 1;
+		  start_y = HAL_GetTick();}
+
+	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, prev_x);
+	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, prev_y);
 
 	  //Encendido de las leds por PWM
 	  if(lights_x >= 0){

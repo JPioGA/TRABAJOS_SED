@@ -61,8 +61,8 @@ all: main-build
 main-build: Plataforma_autonivelable.elf secondary-outputs
 
 # Tool invocations
-Plataforma_autonivelable.elf: $(OBJS) $(USER_OBJS) C:\_UNIVERSIDAD\4_CUARTO\7_SED_Sistemas_Electronicos_Digitales\Trabajos_SED\Codigo_Trabajos_SED\Proyecto_Micros\STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Plataforma_autonivelable.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\_UNIVERSIDAD\4_CUARTO\7_SED_Sistemas_Electronicos_Digitales\Trabajos_SED\Codigo_Trabajos_SED\Proyecto_Micros\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Plataforma_autonivelable.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Plataforma_autonivelable.elf: $(OBJS) $(USER_OBJS) C:\Users\jgome\Documents\laboratorios_uni\SED\VHDL\trabajo_simon_dice\vivado.log\Trabajo_Micros\TRABAJO_FUNCIONANDO\Proyecto_Micros\STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Plataforma_autonivelable.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\jgome\Documents\laboratorios_uni\SED\VHDL\trabajo_simon_dice\vivado.log\Trabajo_Micros\TRABAJO_FUNCIONANDO\Proyecto_Micros\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Plataforma_autonivelable.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
