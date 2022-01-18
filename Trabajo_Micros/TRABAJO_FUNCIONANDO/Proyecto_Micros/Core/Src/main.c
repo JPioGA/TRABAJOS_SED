@@ -23,6 +23,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "math.h"
+#include <stdio.h>
+#include "fonts.h"
+#include "ssd1306.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,6 +46,8 @@
 ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc2;
 
+I2C_HandleTypeDef hi2c1;
+
 SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim3;
@@ -54,6 +59,7 @@ uint8_t spiTxBuf[2];
 uint8_t spiRxBuf[7];
 volatile int16_t accel_x, grad_accel_x, prev_x = 1500;
 volatile int16_t accel_y, grad_accel_y, prev_y = 1500;
+volatile int16_t accel_z;
 
 char buf_x[12];
 char buf_y[12];
@@ -71,13 +77,9 @@ int16_t lights_y, lights_y_2;
 uint32_t start_x, start_y;
 
 
-uint32_t Kp = 1.05;
-
-
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if (GPIO_Pin==GPIO_PIN_0){
 			mode = !mode;
-			//HAL_NVIC_DisableIRQ(EXTI1_IRQn);
 		}
 }
 
@@ -91,6 +93,7 @@ static void MX_ADC1_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -149,9 +152,10 @@ int main(void)
   MX_ADC2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  //SSD1306_Init (); //Inicializo el dispaly OLED
+  SSD1306_Init (); //Inicializo el dispaly OLED
 
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
@@ -179,40 +183,58 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+	  spiTxBuf[0]=0x28|0x80; //OUT_X_L
+	  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,20);
+	  HAL_SPI_Receive(&hspi1,&spiRxBuf[1],1,20);
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+	  spiTxBuf[0]=0x29|0x80; //OUT_X_H
+	  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,20);
+	  HAL_SPI_Receive(&hspi1,&spiRxBuf[2],1,20);
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+	  spiTxBuf[0]=0x2a|0x80; //OUT_Y_L
+	  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,20);
+	  HAL_SPI_Receive(&hspi1,&spiRxBuf[3],1,20);
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+	  spiTxBuf[0]=0x2b|0x80; //OUT_Y_H
+	  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,20);
+	  HAL_SPI_Receive(&hspi1,&spiRxBuf[4],1,20);
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+	  spiTxBuf[0]=0x2c|0x80; //OUT_Z_L
+	  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,20);
+	  HAL_SPI_Receive(&hspi1,&spiRxBuf[5],1,20);
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+	  spiTxBuf[0]=0x2d|0x80; //OUT_Z_H
+	  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,20);
+	  HAL_SPI_Receive(&hspi1,&spiRxBuf[6],1,20);
+	  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+
+	  // Carga de los datos del buffer a las variables
+	  accel_x = (spiRxBuf[2]<<8)|spiRxBuf[1];
+	  accel_y = (spiRxBuf[4]<<8)|spiRxBuf[3];
+	  accel_z = (spiRxBuf[6]<<8)|spiRxBuf[5];
+
+
+	  grad_accel_x = atan(-accel_x/sqrt(pow(accel_y,2) + pow(accel_z,2)))*(180.0/3.1416);
+	  grad_accel_y = atan(accel_y/sqrt(pow(accel_x,2) + pow(accel_z,2)))*(180.0/3.1416);
+
 
 	  if(mode){
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
-		  spiTxBuf[0]=0x28|0x80; //OUT_X_L
-		  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,50);
-		  HAL_SPI_Receive(&hspi1,&spiRxBuf[1],1,50);
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
-
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
-		  spiTxBuf[0]=0x29|0x80; //OUT_X_H
-		  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,50);
-		  HAL_SPI_Receive(&hspi1,&spiRxBuf[2],1,50);
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
-
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
-		  spiTxBuf[0]=0x2a|0x80; //OUT_Y_L
-		  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,50);
-		  HAL_SPI_Receive(&hspi1,&spiRxBuf[3],1,50);
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
-
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
-		  spiTxBuf[0]=0x2b|0x80; //OUT_Y_H
-		  HAL_SPI_Transmit(&hspi1,spiTxBuf,1,50);
-		  HAL_SPI_Receive(&hspi1,&spiRxBuf[4],1,50);
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
-
-		  // Carga de los datos del buffer a las variables
-		  accel_x = (spiRxBuf[2]<<8)|spiRxBuf[1];
-		  accel_y = (spiRxBuf[4]<<8)|spiRxBuf[3];
-
-
-		  lights_x = map_acc(accel_x); // -945
+		  lights_x = map_acc(accel_x);
 		  lights_y = map_acc(accel_y) ;
 	  }
+
+
 	  else{
 		  HAL_ADC_Start(&hadc1);
 		  if(HAL_ADC_PollForConversion(&hadc1, 100)==HAL_OK)
@@ -231,21 +253,18 @@ int main(void)
 	  angle_x = map_angle(lights_x);
 	  angle_y = map_angle(-lights_y);
 
-
-
-
 	  if(HAL_GetTick() - start_x > 2){
 		  if(prev_x < angle_x)
-		  	  prev_x += 1;
+		  	  prev_x += 10;
 		  else
-			  prev_x -= 1;
+			  prev_x -= 10;
 		  start_x = HAL_GetTick();}
 
 	  if(HAL_GetTick() - start_y > 2){
 		  if(prev_y < angle_y)
-			  prev_y += 1;
+			  prev_y += 10;
 		  else
-			  prev_y -= 1;
+			  prev_y -= 10;
 		  start_y = HAL_GetTick();}
 
 	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, prev_x);
@@ -269,7 +288,24 @@ int main(void)
 	  	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 0);
 	  	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, -lights_y);
 	  }
+	  //Muestra por pantalla OLED
 
+	  sprintf(buf_x, "%d", grad_accel_x);
+	  sprintf(buf2_x, "%-10s", buf_x); //Relleno de espacios el resto del string
+	  sprintf(buf_y, "%d", grad_accel_y);
+	  sprintf(buf2_y, "%-10s", buf_y); //Relleno de espacios el resto del string
+
+	  SSD1306_GotoXY (5, 10); // goto 10, 10
+	  SSD1306_Puts ("X: ", &Font_7x10, 1);
+	  SSD1306_GotoXY (30, 10);
+	  SSD1306_Puts (buf2_x, &Font_7x10, 1);
+
+	  SSD1306_GotoXY (5, 30);
+	  SSD1306_Puts ("Y: ", &Font_7x10, 1);
+	  SSD1306_GotoXY (30, 30);
+	  SSD1306_Puts (buf2_y, &Font_7x10, 1);
+
+	  SSD1306_UpdateScreen(); // update screen
   }
   /* USER CODE END 3 */
 }
@@ -415,6 +451,40 @@ static void MX_ADC2_Init(void)
   /* USER CODE BEGIN ADC2_Init 2 */
 
   /* USER CODE END ADC2_Init 2 */
+
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 400000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
 
 }
 
@@ -604,6 +674,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
